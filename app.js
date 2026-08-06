@@ -159,3 +159,47 @@ function initRealMap() {
 
 initRealMap();
 refreshPreciseLocation();
+
+// JellyDex: GitHub Pages에서도 동작하는 브라우저 저장형 수집 게임
+const JELLY_COLORS = ['빨강', '주황', '노랑', '초록', '하늘색', '파랑', '보라', '분홍', '흰색'];
+const SHOP_ITEMS = [
+  ['산호', 50, '자연 장식'], ['해초', 50, '자연 장식'], ['조개', 50, '자연 장식'], ['불가사리', 70, '자연 장식'], ['진주 조개', 100, '자연 장식'],
+  ['조개 침대', 100, '가구'], ['해초 소파', 120, '가구'], ['산호 의자', 120, '가구'], ['조개 테이블', 100, '가구'], ['보물상자', 150, '가구'], ['미니 등대', 200, '가구'],
+  ['기본 조명', 50, '조명'], ['블루 조명', 100, '조명'], ['핑크 조명', 100, '조명'], ['오로라 조명', 250, '조명'], ['네온 조명', 300, '조명'],
+  ['얕은 바다', 100, '배경'], ['산호초', 200, '배경'], ['심해', 300, '배경'], ['야간 바다', 300, '배경'], ['부산 광안리 테마', 500, '배경']
+];
+const TANK_CAPACITY = [5, 10, 15, 20, 30];
+let jellyDexState = JSON.parse(localStorage.getItem('jellydex_state') || 'null') || { coins: 0, tankLevel: 1, jellies: [], items: [] };
+const saveJellyDex = () => localStorage.setItem('jellydex_state', JSON.stringify(jellyDexState));
+const jellydexContent = document.querySelector('#jellydexContent');
+const jellyfishMarkup = (jelly, extra = '') => `<button class="pixel-jelly jelly-${jelly.colorIndex}" data-jelly-id="${jelly.id}" style="--jelly-scale:${1 + jelly.affection / 250}" aria-label="${jelly.name} 쓰다듬기"><span class="pixel-cap"></span><i></i><i></i><i></i><i></i></button><strong class="jelly-name">${jelly.name}</strong>${extra}`;
+function renderGame(tab = 'home') {
+  document.querySelector('#coinCount').textContent = jellyDexState.coins;
+  const capacity = TANK_CAPACITY[jellyDexState.tankLevel - 1];
+  if (tab === 'home') {
+    jellydexContent.innerHTML = `<section class="game-hero"><div><span class="pixel-kicker">DAILY DISCOVERY</span><h3>부산 바다에서<br><em>새 친구를 찾아요!</em></h3><p>해파리 사진을 인증하면 픽셀 해파리와 100코인을 받아요.</p><label class="scan-upload"><input id="jellyScan" type="file" accept="image/*"><span>📷 사진으로 해파리 인증</span></label><small id="scanStatus">AI 인증 대기 중 · 사진을 올려보세요</small></div><div class="game-orb">🪼<span>+100</span></div></section><section class="game-section"><div class="game-section-title"><h3>내 수조</h3><button data-game-tab="tank">모두 보기 →</button></div><div class="mini-tank">${jellyDexState.jellies.slice(0, 5).map(j => `<div class="jelly-card">${jellyfishMarkup(j)}</div>`).join('') || '<p class="empty-state">아직 해파리가 없어요. 첫 친구를 만나보세요!</p>'}</div></section>`;
+    document.querySelector('#jellyScan')?.addEventListener('change', authenticateJelly);
+  } else if (tab === 'tank') {
+    jellydexContent.innerHTML = `<section class="game-section"><div class="game-section-title"><div><span class="pixel-kicker">AQUARIUM LV.${jellyDexState.tankLevel}</span><h3>나의 수조 <small>${jellyDexState.jellies.length}/${capacity}</small></h3></div><button class="upgrade-button" ${jellyDexState.tankLevel >= 5 ? 'disabled' : ''} data-upgrade-tank>수조 업그레이드<br><b>🪙 300</b></button></div><div class="tank-scene">${jellyDexState.jellies.map(j => `<div class="tank-jelly" data-jelly-id="${j.id}">${jellyfishMarkup(j, `<span class="affection">♥ ${j.affection}</span>`)}</div>`).join('') || '<p class="empty-state">수조가 비어 있어요.</p>'}</div></section>`;
+    document.querySelector('[data-upgrade-tank]')?.addEventListener('click', upgradeTank);
+    document.querySelectorAll('[data-jelly-id]').forEach(el => el.addEventListener('click', () => openJellyActions(el.dataset.jellyId)));
+  } else if (tab === 'dex') {
+    jellydexContent.innerHTML = `<section class="game-section"><div class="game-section-title"><div><span class="pixel-kicker">COLLECTION</span><h3>해파리 도감 <small>${jellyDexState.jellies.length}종</small></h3></div></div><div class="dex-grid">${jellyDexState.jellies.map(j => `<article class="dex-card">${jellyfishMarkup(j)}<small>${j.acquiredAt} · ${j.color}</small><span>친밀도 ${j.affection} · ${j.stage}</span></article>`).join('') || '<p class="empty-state">인증한 해파리가 자동으로 등록됩니다.</p>'}</div></section>`;
+  } else if (tab === 'shop') {
+    jellydexContent.innerHTML = `<section class="game-section"><div class="game-section-title"><div><span class="pixel-kicker">AQUARIUM SHOP</span><h3>수조 상점</h3></div></div><div class="shop-grid">${SHOP_ITEMS.map(([name, price, category]) => `<button class="shop-item" data-shop-name="${name}" data-shop-price="${price}"><span>${category === '자연 장식' ? '🪸' : category === '가구' ? '🛋️' : category === '조명' ? '💡' : '🌊'}</span><b>${name}</b><small>🪙 ${price}</small></button>`).join('')}</div></section>`;
+    document.querySelectorAll('[data-shop-name]').forEach(el => el.addEventListener('click', () => buyItem(el.dataset.shopName, Number(el.dataset.shopPrice))));
+  } else {
+    jellydexContent.innerHTML = `<section class="profile-card"><div class="avatar">🧑‍🚀</div><span class="pixel-kicker">JELLY TRAINER</span><h3>바다 탐험가</h3><p>해파리 ${jellyDexState.jellies.length}마리 · 수조 레벨 ${jellyDexState.tankLevel}</p><div class="profile-stats"><span><b>${jellyDexState.coins}</b>코인</span><span><b>${jellyDexState.items.length}</b>장식</span></div></section>`;
+  }
+  document.querySelectorAll('[data-game-tab]').forEach(btn => btn.onclick = () => { document.querySelectorAll('.jellydex-tabs button').forEach(b => b.classList.toggle('active', b.dataset.gameTab === btn.dataset.gameTab)); renderGame(btn.dataset.gameTab); });
+}
+function authenticateJelly(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const status = document.querySelector('#scanStatus'); status.textContent = 'AI가 사진 속 해파리를 분석하는 중…';
+  setTimeout(() => { const colorIndex = Math.floor(Math.random() * JELLY_COLORS.length); const jelly = { id: crypto.randomUUID?.() || `${Date.now()}`, name: `Jelly ${jellyDexState.jellies.length + 1}`, color: JELLY_COLORS[colorIndex], colorIndex, affection: 10, stage: '아기', acquiredAt: new Date().toLocaleDateString('ko-KR') }; if (jellyDexState.jellies.length >= TANK_CAPACITY[jellyDexState.tankLevel - 1]) { status.textContent = '수조가 가득 찼어요. 먼저 업그레이드해 주세요.'; return; } jellyDexState.jellies.push(jelly); jellyDexState.coins += 100; saveJellyDex(); status.textContent = `인증 성공! ${jelly.name} 획득 · +100코인`; renderGame('home'); showToast('🪼 새로운 해파리와 100코인을 획득했어요!'); }, 1100);
+}
+function upgradeTank() { if (jellyDexState.tankLevel >= 5 || jellyDexState.coins < 300) return showToast('수조 업그레이드에는 300코인이 필요해요.'); jellyDexState.coins -= 300; jellyDexState.tankLevel += 1; saveJellyDex(); renderGame('tank'); }
+function buyItem(name, price) { if (jellyDexState.coins < price) return showToast('코인이 부족해요.'); jellyDexState.coins -= price; jellyDexState.items.push(name); saveJellyDex(); renderGame('shop'); showToast(`${name}을(를) 수조에 추가했어요!`); }
+function openJellyActions(id) { const jelly = jellyDexState.jellies.find(item => item.id === id); if (!jelly) return; const action = prompt(`${jelly.name}에게 무엇을 할까요?\n1. 먹이 주기\n2. 쓰다듬기\n3. 놀아주기`, '2'); if (action && ['1', '2', '3'].includes(action)) { jelly.affection = Math.min(100, jelly.affection + 10); jelly.stage = jelly.affection >= 70 ? '성체' : jelly.affection >= 35 ? '성장기' : '아기'; saveJellyDex(); renderGame('tank'); showToast(`♥ ${jelly.name}의 친밀도가 올랐어요!`); } }
+document.querySelector('#jellydexLaunch').addEventListener('click', () => { document.querySelector('#jellydexOverlay').classList.add('open'); document.querySelector('#jellydexOverlay').setAttribute('aria-hidden', 'false'); renderGame('home'); });
+document.querySelector('#jellydexClose').addEventListener('click', () => { document.querySelector('#jellydexOverlay').classList.remove('open'); document.querySelector('#jellydexOverlay').setAttribute('aria-hidden', 'true'); });
