@@ -29,6 +29,7 @@
   const layer = L.layerGroup().addTo(map);
   let allPlaces = [];
   let reportLocation = null;
+  let locationReady = false;
 
   const render = places => {
     layer.clearLayers();
@@ -63,10 +64,17 @@
   };
 
   mapCard.insertAdjacentHTML('afterend', '<div class="care-map-legend"><span><i class="care-legend-icon hospital-legend-icon"></i><b>병원</b><small>빨간 십자가</small></span><span><i class="care-legend-icon health-legend-icon"></i><b>보건소</b><small>초록 십자가</small></span><small class="care-filter-note">의료시설 정보를 불러오는 중…</small></div>');
-  navigator.geolocation?.getCurrentPosition(position => {
-    reportLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
-    map.setView([reportLocation.lat, reportLocation.lng], 15);
-  }, () => {});
+  const requestLocation = () => new Promise(resolve => {
+    if (!navigator.geolocation) return resolve(false);
+    navigator.geolocation.getCurrentPosition(position => {
+      reportLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
+      locationReady = true;
+      map.setView([reportLocation.lat, reportLocation.lng], 15);
+      const note = document.querySelector('.care-filter-note');
+      if (note) note.textContent = '현재 위치 확인 완료 · 반경 1km 이내 시설만 표시합니다.';
+      resolve(true);
+    }, () => resolve(false), { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+  });
   document.querySelector('#reportForm')?.addEventListener('submit', event => {
     navigator.geolocation?.getCurrentPosition(position => {
       reportLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
@@ -74,5 +82,11 @@
       updateFilter();
     }, () => updateFilter(), { enableHighAccuracy: true, timeout: 10000 });
   }, true);
-  loadPlaces();
+  (async () => {
+    const found = await requestLocation();
+    const note = document.querySelector('.care-filter-note');
+    if (!found && note) note.textContent = '위치 권한이 없어 부산 해안권 전체 시설을 표시합니다.';
+    await loadPlaces();
+    if (locationReady) updateFilter();
+  })();
 }());
