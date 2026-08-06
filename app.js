@@ -175,8 +175,9 @@ const SHOP_ITEMS = [
   ['얕은 바다', 100, '배경'], ['산호초', 200, '배경'], ['심해', 300, '배경'], ['야간 바다', 300, '배경'], ['부산 광안리 테마', 500, '배경']
 ];
 const TANK_CAPACITY = [5, 10, 15, 20, 30];
-let jellyDexState = JSON.parse(localStorage.getItem('jellydex_state') || 'null') || { coins: 0, tankLevel: 1, jellies: [], items: [] };
-const saveJellyDex = () => localStorage.setItem('jellydex_state', JSON.stringify(jellyDexState));
+const jellyDexStorageKey = () => `jellydex_state_${window.jellyDexUser?.uid || 'guest'}`;
+let jellyDexState = JSON.parse(localStorage.getItem(jellyDexStorageKey()) || 'null') || { coins: 0, tankLevel: 1, jellies: [], items: [] };
+const saveJellyDex = () => localStorage.setItem(jellyDexStorageKey(), JSON.stringify(jellyDexState));
 const jellydexContent = document.querySelector('#jellydexContent');
 const jellyfishMarkup = (jelly, extra = '') => `<button class="pixel-jelly jelly-${jelly.colorIndex}" data-jelly-id="${jelly.id}" style="--jelly-scale:${1 + jelly.affection / 250}" aria-label="${jelly.name} 쓰다듬기"><span class="pixel-cap"></span><i></i><i></i><i></i><i></i></button><strong class="jelly-name">${jelly.name}</strong>${extra}`;
 function renderGame(tab = 'home') {
@@ -207,5 +208,5 @@ function authenticateJelly(event) {
 function upgradeTank() { if (jellyDexState.tankLevel >= 5 || jellyDexState.coins < 300) return showToast('수조 업그레이드에는 300코인이 필요해요.'); jellyDexState.coins -= 300; jellyDexState.tankLevel += 1; saveJellyDex(); renderGame('tank'); }
 function buyItem(name, price) { if (jellyDexState.coins < price) return showToast('코인이 부족해요.'); jellyDexState.coins -= price; jellyDexState.items.push(name); saveJellyDex(); renderGame('shop'); showToast(`${name}을(를) 수조에 추가했어요!`); }
 function openJellyActions(id) { const jelly = jellyDexState.jellies.find(item => item.id === id); if (!jelly) return; const action = prompt(`${jelly.name}에게 무엇을 할까요?\n1. 먹이 주기\n2. 쓰다듬기\n3. 놀아주기`, '2'); if (action && ['1', '2', '3'].includes(action)) { jelly.affection = Math.min(100, jelly.affection + 10); jelly.stage = jelly.affection >= 70 ? '성체' : jelly.affection >= 35 ? '성장기' : '아기'; saveJellyDex(); renderGame('tank'); showToast(`♥ ${jelly.name}의 친밀도가 올랐어요!`); } }
-document.querySelector('#jellydexLaunch').addEventListener('click', () => { document.querySelector('#jellydexOverlay').classList.add('open'); document.querySelector('#jellydexOverlay').setAttribute('aria-hidden', 'false'); renderGame('home'); });
+document.querySelector('#jellydexLaunch').addEventListener('click', () => { if (!window.jellyDexUser) return; document.querySelector('#jellydexOverlay').classList.add('open'); document.querySelector('#jellydexOverlay').setAttribute('aria-hidden', 'false'); renderGame('home'); });
 document.querySelector('#jellydexClose').addEventListener('click', () => { document.querySelector('#jellydexOverlay').classList.remove('open'); document.querySelector('#jellydexOverlay').setAttribute('aria-hidden', 'true'); });

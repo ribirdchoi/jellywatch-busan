@@ -71,6 +71,18 @@
     </div>
     <div class="toast" id="toast">신고가 접수되었습니다. 안전요원에게 전달할게요.</div>
     <div class="jellydex-overlay" id="jellydexOverlay" aria-hidden="true">
+      <section class="jelly-auth" id="jellyAuth" aria-labelledby="authTitle" hidden>
+        <div class="jelly-auth-card">
+          <span class="pixel-kicker">JELLYDEX 회원</span>
+          <h2 id="authTitle">나만의 해파리 수조</h2>
+          <p>아이디로 로그인하면 여러 기기에서 게임 기록을 이어갈 수 있어요.</p>
+          <div class="auth-tabs"><button type="button" class="active" data-auth-tab="login">로그인</button><button type="button" data-auth-tab="signup">회원가입</button></div>
+          <form id="jellyLoginForm" class="auth-form"><label>아이디<input name="email" type="email" autocomplete="username" placeholder="이메일 주소" required></label><label>비밀번호<input name="password" type="password" autocomplete="current-password" minlength="6" placeholder="6자 이상" required></label><button class="auth-submit" type="submit">로그인</button></form>
+          <form id="jellySignupForm" class="auth-form" hidden><label>아이디<input name="email" type="email" autocomplete="username" placeholder="이메일 주소" required></label><label>비밀번호<input name="password" type="password" autocomplete="new-password" minlength="6" placeholder="6자 이상" required></label><label>비밀번호 확인<input name="passwordConfirm" type="password" minlength="6" placeholder="비밀번호를 한 번 더 입력" required></label><button class="auth-submit" type="submit">회원가입</button></form>
+          <p class="auth-status" id="authStatus" role="status"></p>
+          <button class="auth-cancel" id="authCancel" type="button">나중에 하기</button>
+        </div>
+      </section>
       <div class="jellydex-game" role="dialog" aria-modal="true" aria-labelledby="jellydexTitle">
         <button class="jellydex-close" id="jellydexClose" type="button" aria-label="게임 닫기">×</button>
         <header class="jellydex-head"><div><span class="pixel-kicker">도트 바다 / 부산</span><h2 id="jellydexTitle"><span class="pixel-icon pixel-jelly-icon" aria-hidden="true"></span> JellyDex</h2><p>발견하고, 키우고, 나만의 수조를 꾸며요.</p></div><div class="coin-pill"><span class="pixel-icon pixel-coin-icon" aria-hidden="true"></span> <strong id="coinCount">0</strong></div></header>
@@ -80,6 +92,7 @@
     </div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="firebase-client.js"></script>
+    <script src="jelly-auth.js"></script>
     <script src="app.js"></script>
     <script src="care.js"></script>
     <script src="jellydex.js"></script>
