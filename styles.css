@@ -104,3 +104,28 @@ button,.panel,.help-card,.profile-card,.dex-card,.shop-item,.map-legend,.coin-pi
 body:has(.jellydex-overlay.open){overflow:hidden;overscroll-behavior:none}
 .jelly-auth{overflow:hidden;touch-action:none}
 .jelly-auth-card{max-height:calc(100dvh - 40px);overflow:hidden;overscroll-behavior:none}
+
+/* 32비트 도트 스프라이트: 브라우저 기본 이모지와 부드러운 벡터 아이콘을 사용하지 않습니다. */
+*{image-rendering:pixelated}
+.pixel-arrow{display:inline-block;width:14px;height:10px;margin-left:8px;vertical-align:-1px;background:#f2f2f2;clip-path:polygon(0 35%,65% 35%,65% 0,100% 50%,65% 100%,65% 65%,0 65%)}
+.pixel-location-icon{display:inline-block;position:relative;width:14px;height:18px;vertical-align:-4px;background:#477e98;clip-path:polygon(0 0,100% 0,100% 58%,50% 100%,0 58%)}
+.pixel-location-icon:after{content:'';position:absolute;left:4px;top:4px;width:6px;height:6px;background:#d5e8eb}
+.pixel-spark{display:inline-block;width:18px;height:18px;vertical-align:-4px;background:#77b8c4;box-shadow:7px 0 #77b8c4,0 7px #77b8c4,7px 7px #c6e5e5,14px 7px #77b8c4,7px 14px #77b8c4}
+.upload-icon.pixel-camera-icon,.pixel-camera-icon{display:inline-block;position:relative;width:28px;height:20px;background:#477e98;border:3px solid #294f67;box-sizing:border-box}
+.pixel-camera-icon:before{content:'';position:absolute;left:5px;top:-7px;width:9px;height:5px;background:#294f67}
+.pixel-camera-icon:after{content:'';position:absolute;left:7px;top:4px;width:8px;height:8px;background:#c6e5e5;border:2px solid #294f67;box-sizing:border-box}
+.scan-upload>span{display:inline-flex;align-items:center;gap:9px}.scan-upload .pixel-camera-icon{background:#d5e8eb;border-color:#f2f2f2}.scan-upload .pixel-camera-icon:before{background:#f2f2f2}.scan-upload .pixel-camera-icon:after{background:#497b96;border-color:#f2f2f2}
+.pixel-icon{border-radius:0!important}
+.pixel-jelly-icon{background:transparent!important;box-shadow:none!important}
+.pixel-jelly-icon:before{left:7px!important;top:8px!important;width:34px!important;height:20px!important;background:#8fcbd2!important;box-shadow:6px 20px #8fcbd2,14px 20px #8fcbd2,22px 20px #8fcbd2,30px 20px #8fcbd2!important;clip-path:polygon(12% 0,88% 0,100% 30%,88% 70%,70% 100%,30% 100%,12% 70%,0 30%)}
+.pixel-jelly-icon:after{left:17px!important;top:16px!important;width:4px!important;height:4px!important;background:#294f67!important;box-shadow:14px 0 #294f67,7px 7px #6b9eaf!important}
+.pixel-jelly-icon-large{width:84px!important;height:84px!important}.pixel-jelly-icon-large:before{transform:scale(1.45);transform-origin:top left}.pixel-jelly-icon-large:after{transform:scale(1.45);transform-origin:top left}
+.pixel-coin-icon{display:inline-block;position:relative;width:15px;height:15px;background:#9bbdc4;border:3px solid #416b7c;box-sizing:border-box;vertical-align:-3px;box-shadow:3px 3px #6e9aa8}
+.pixel-heart{display:inline-block;width:10px;height:9px;vertical-align:-1px;background:#b56f82;box-shadow:3px -3px #b56f82,6px 0 #b56f82,3px 3px #b56f82}
+.pixel-shop-art{display:block;position:relative;width:34px;height:34px;background:#6b9eaf;box-shadow:6px 0 #6b9eaf,0 6px #6b9eaf,6px 6px #9bcbd0,12px 6px #6b9eaf,6px 12px #6b9eaf}
+.shop-nature{background:#5f9b9d;box-shadow:6px 0 #5f9b9d,12px 0 #5f9b9d,0 6px #477e98,6px 6px #78b6a5,12px 6px #477e98,6px 12px #78b6a5}
+.shop-furniture{background:#9c7f6d;box-shadow:6px 0 #9c7f6d,12px 0 #9c7f6d,0 6px #6e5660,6px 6px #c49a7b,12px 6px #6e5660,0 12px #6e5660,12px 12px #6e5660}
+.shop-light{background:#c6a35c;box-shadow:6px 0 #c6a35c,0 6px #9b7d50,6px 6px #f0d68b,12px 6px #9b7d50,6px 12px #c6a35c}
+.shop-sea{background:#5f87ad;box-shadow:6px 0 #5f87ad,12px 0 #5f87ad,0 6px #477e98,6px 6px #8fcbd2,12px 6px #477e98,6px 12px #8fcbd2}
+.pixel-explorer{display:inline-block;position:relative;width:48px;height:58px;background:#477e98;box-shadow:8px 0 #477e98,16px 0 #477e98,24px 0 #477e98,32px 0 #477e98,8px 8px #c6e5e5,16px 8px #c6e5e5,24px 8px #c6e5e5,32px 8px #c6e5e5,0 32px #294f67,8px 32px #294f67,16px 32px #6b9eaf,24px 32px #6b9eaf,32px 32px #294f67}
+.avatar{font-size:0}
