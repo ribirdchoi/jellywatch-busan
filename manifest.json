@@ -1,0 +1,9 @@
+{
+  "name": "JELLYWATCH 해파리 안전 신고",
+  "short_name": "JELLYWATCH",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8f8f4",
+  "theme_color": "#f8f8f4",
+  "lang": "ko-KR"
+}
