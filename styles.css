@@ -129,3 +129,25 @@ body:has(.jellydex-overlay.open){overflow:hidden;overscroll-behavior:none}
 .shop-sea{background:#5f87ad;box-shadow:6px 0 #5f87ad,12px 0 #5f87ad,0 6px #477e98,6px 6px #8fcbd2,12px 6px #477e98,6px 12px #8fcbd2}
 .pixel-explorer{display:inline-block;position:relative;width:48px;height:58px;background:#477e98;box-shadow:8px 0 #477e98,16px 0 #477e98,24px 0 #477e98,32px 0 #477e98,8px 8px #c6e5e5,16px 8px #c6e5e5,24px 8px #c6e5e5,32px 8px #c6e5e5,0 32px #294f67,8px 32px #294f67,16px 32px #6b9eaf,24px 32px #6b9eaf,32px 32px #294f67}
 .avatar{font-size:0}
+
+/* 지도와 글자를 제외한 그림·아이콘은 둥글고 부드러운 바다 친구로 바꿉니다. */
+.jellydex-launch,.button,.location-pill,.scan-upload,.upgrade-button,.jellydex-close,.coin-pill,.auth-submit,.auth-tabs button,.profile-stats span,.help-icon,.shop-item,.dex-card,.game-hero,.mini-tank,.tank-scene,.jelly-auth-card,.jellydex-game{border-radius:22px}
+.jellydex-tabs{border-radius:0 0 22px 22px}.jellydex-tabs button{border-radius:18px}
+.pixel-icon,.pixel-camera-icon,.pixel-location-icon,.pixel-arrow,.pixel-spark,.pixel-coin-icon,.pixel-heart,.pixel-shop-art,.pixel-explorer{border-radius:50%}
+.pixel-camera-icon:before,.pixel-camera-icon:after,.pixel-location-icon:after,.pixel-jelly-icon:before,.pixel-jelly-icon:after{border-radius:50%}
+
+/* 동글동글한 해파리 표정과 촉수 */
+.pixel-jelly{width:78px;height:94px;animation:current-drift 7s ease-in-out infinite;transform-origin:center bottom}
+.pixel-cap{left:8px;top:13px;width:62px;height:43px;border-radius:52% 52% 42% 42%;box-shadow:inset 0 -9px #ffffff38,0 4px 0 #294f6730}
+.pixel-cap:before{content:'';position:absolute;left:18px;top:17px;width:5px;height:5px;border-radius:50%;background:#294f67;box-shadow:21px 0 #294f67,10px 9px 0 -1px #294f67}
+.pixel-jelly i{top:50px;width:11px;height:32px;border-radius:0 0 12px 12px;opacity:.96}
+.pixel-jelly i:nth-of-type(1){left:15px;transform:rotate(9deg)}.pixel-jelly i:nth-of-type(2){left:29px;height:40px}.pixel-jelly i:nth-of-type(3){left:43px;height:35px;transform:rotate(-7deg)}.pixel-jelly i:nth-of-type(4){left:56px;height:28px;transform:rotate(-12deg)}
+.pixel-jelly:hover{filter:drop-shadow(0 0 8px #d9f7fa);animation-play-state:paused}
+.jelly-card:nth-child(2n) .pixel-jelly,.tank-jelly:nth-child(2n) .pixel-jelly{animation-delay:-2.4s}.jelly-card:nth-child(3n) .pixel-jelly,.tank-jelly:nth-child(3n) .pixel-jelly{animation-delay:-4.7s}
+.jellyfish{animation:hero-current 8s ease-in-out infinite}.jelly-cap{border-radius:58% 58% 44% 44%}.tentacle{border-radius:0 0 16px 16px}
+.mini-tank:before,.tank-scene:before{content:'';position:absolute;inset:12% -16%;background:repeating-radial-gradient(ellipse at center,transparent 0 22px,#d9f7fa18 23px 25px,transparent 26px 48px);animation:sea-current 12s linear infinite;pointer-events:none}
+.mini-tank:after,.tank-scene:after{content:'●  ·  ●  ·  ●';letter-spacing:12px;color:#e6ffff9c;animation:bubble-current 9s linear infinite}
+@keyframes current-drift{0%,100%{transform:translate(0,0) rotate(-3deg) scale(var(--jelly-scale))}25%{transform:translate(13px,-8px) rotate(4deg) scale(var(--jelly-scale))}50%{transform:translate(25px,3px) rotate(-1deg) scale(var(--jelly-scale))}75%{transform:translate(10px,9px) rotate(-5deg) scale(var(--jelly-scale))}}
+@keyframes hero-current{0%,100%{transform:translate(0,0) rotate(-5deg)}45%{transform:translate(32px,-14px) rotate(5deg)}75%{transform:translate(12px,10px) rotate(-2deg)}}
+@keyframes sea-current{from{transform:translateX(-5%)}to{transform:translateX(18%)}}@keyframes bubble-current{from{transform:translate(0,0)}to{transform:translate(-85px,-35px)}}
+@media (prefers-reduced-motion:reduce){.pixel-jelly,.jellyfish,.mini-tank:before,.tank-scene:before,.mini-tank:after,.tank-scene:after{animation:none!important}}
