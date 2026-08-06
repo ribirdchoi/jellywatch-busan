@@ -29,6 +29,8 @@
   window.jellyDexRequireLogin = (openGame) => {
     pendingOpen = openGame;
     if (window.jellyFirebase?.auth?.currentUser) { finish(window.jellyFirebase.auth.currentUser); return; }
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
     auth.hidden = false; game.hidden = true; status.textContent = '게임 기록을 저장하려면 로그인해 주세요.';
   };
   window.jellyDexLogout = async () => {
