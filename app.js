@@ -177,7 +177,17 @@ const SHOP_ITEMS = [
 const TANK_CAPACITY = [5, 10, 15, 20, 30];
 const jellyDexStorageKey = () => `jellydex_state_${window.jellyDexUser?.uid || 'guest'}`;
 let jellyDexState = JSON.parse(localStorage.getItem(jellyDexStorageKey()) || 'null') || { coins: 0, tankLevel: 1, jellies: [], items: [] };
-const saveJellyDex = () => localStorage.setItem(jellyDexStorageKey(), JSON.stringify(jellyDexState));
+const saveJellyDex = () => {
+  localStorage.setItem(jellyDexStorageKey(), JSON.stringify(jellyDexState));
+  if (window.jellyDexUser?.uid && window.jellyFirebase?.saveGameState) {
+    window.jellyFirebase.saveGameState(window.jellyDexUser.uid, jellyDexState).catch((error) => console.warn('게임 저장 실패:', error));
+  }
+};
+window.jellyDexApplyCloudState = (remote) => {
+  if (!remote) return;
+  jellyDexState = { coins: 0, tankLevel: 1, jellies: [], items: [], ...remote };
+  localStorage.setItem(jellyDexStorageKey(), JSON.stringify(jellyDexState));
+};
 const jellydexContent = document.querySelector('#jellydexContent');
 const jellyfishMarkup = (jelly, extra = '') => `<button class="pixel-jelly jelly-${jelly.colorIndex}" data-jelly-id="${jelly.id}" style="--jelly-scale:${1 + jelly.affection / 250}" aria-label="${jelly.name} 쓰다듬기"><span class="pixel-cap"></span><i></i><i></i><i></i><i></i></button><strong class="jelly-name">${jelly.name}</strong>${extra}`;
 function renderGame(tab = 'home') {
