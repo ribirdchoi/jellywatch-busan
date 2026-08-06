@@ -135,6 +135,8 @@ body:has(.jellydex-overlay.open){overflow:hidden;overscroll-behavior:none}
 .jellydex-tabs{border-radius:0 0 22px 22px}.jellydex-tabs button{border-radius:18px}
 .pixel-icon,.pixel-camera-icon,.pixel-location-icon,.pixel-arrow,.pixel-spark,.pixel-coin-icon,.pixel-heart,.pixel-shop-art,.pixel-explorer{border-radius:50%}
 .pixel-camera-icon:before,.pixel-camera-icon:after,.pixel-location-icon:after,.pixel-jelly-icon:before,.pixel-jelly-icon:after{border-radius:50%}
+/* 사진 추가 영역의 카메라는 픽셀 카메라처럼 각진 형태를 유지합니다. */
+.upload-box .pixel-camera-icon,.upload-box .pixel-camera-icon:before,.upload-box .pixel-camera-icon:after{border-radius:0}
 
 /* 동글동글한 해파리 표정과 촉수 */
 .pixel-jelly{width:78px;height:94px;animation:current-drift 7s ease-in-out infinite;transform-origin:center bottom}
