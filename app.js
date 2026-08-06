@@ -59,6 +59,13 @@ function refreshPreciseLocation() {
 }
 
 async function submitReport(report) {
+  if (window.jellyFirebaseReady) {
+    const firebase = await window.jellyFirebaseReady;
+    if (firebase?.ready && firebase.addReport) {
+      await firebase.addReport(report);
+      return;
+    }
+  }
   if (MUNICIPAL_REPORT_ENDPOINT) {
     const response = await fetch(MUNICIPAL_REPORT_ENDPOINT, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(report)
@@ -158,8 +165,6 @@ function initRealMap() {
   addNearbyCareMarkers();
 }
 
-initRealMap();
-refreshPreciseLocation();
 
 // JellyDex: GitHub Pages에서도 동작하는 브라우저 저장형 수집 게임
 const JELLY_COLORS = ['빨강', '주황', '노랑', '초록', '하늘색', '파랑', '보라', '분홍', '흰색'];
