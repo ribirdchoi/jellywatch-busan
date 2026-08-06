@@ -65,3 +65,32 @@ img,video,iframe{max-width:100%;height:auto}
 .care-legend-icon:before,.care-legend-icon:after{content:'';position:absolute;left:50%;top:50%;background:#fff;transform:translate(-50%,-50%)}
 .care-legend-icon:before{width:13px;height:4px}.care-legend-icon:after{width:4px;height:13px}
 .hospital-legend-icon{background:#e53935}.health-legend-icon{background:#28a567}
+
+/* 차분한 푸른색 32비트 도트아트 테마 */
+:root{--ink:#171717;--muted:#667b86;--line:#c9dce2;--aqua:#83c8d0;--mint:#c8e5e8;--coral:#5b8fa8;--cream:#e8f0f2;--navy:#203f55}
+body,.app-shell{background:var(--cream);color:var(--ink)}
+button,.panel,.help-card,.profile-card,.dex-card,.shop-item,.map-legend,.coin-pill{color:#171717}
+*{image-rendering:pixelated}
+.hero-art,.map-card,.mini-tank,.tank-scene{background:#477e98}
+.hero-art{border:4px solid #294f67}
+.sun{background:#b7d2d2;border-radius:0;width:96px;height:96px;box-shadow:8px 0 #b7d2d2,16px 8px #b7d2d2,0 8px #b7d2d2}
+.jelly-cap,.tentacle{background:#b9e0e3;border-radius:0}.jelly-cap:after{background:#7bb4c0;border-radius:0}
+.pixel-jelly{filter:none;image-rendering:pixelated}
+.pixel-cap{border-radius:8px 8px 2px 2px;box-shadow:inset 0 -7px #ffffff33}
+.pixel-jelly i{border-radius:0 0 4px 4px}
+.jelly-0 .pixel-cap,.jelly-0 i{background:#688da3}.jelly-1 .pixel-cap,.jelly-1 i{background:#789db0}.jelly-2 .pixel-cap,.jelly-2 i{background:#8babb8}.jelly-3 .pixel-cap,.jelly-3 i{background:#5f9b9d}.jelly-4 .pixel-cap,.jelly-4 i{background:#76b6c6}.jelly-5 .pixel-cap,.jelly-5 i{background:#5f87ad}.jelly-6 .pixel-cap,.jelly-6 i{background:#7f8fb0}.jelly-7 .pixel-cap,.jelly-7 i{background:#9b8da8}.jelly-8 .pixel-cap,.jelly-8 i{background:#cbdfe1}
+.pixel-icon{display:inline-block;position:relative;width:24px;height:24px;vertical-align:middle;image-rendering:pixelated}
+.pixel-jelly-icon:before{content:'';position:absolute;left:3px;top:5px;width:18px;height:11px;background:#8fcbd2;box-shadow:3px 11px #8fcbd2,8px 11px #8fcbd2,13px 11px #8fcbd2}
+.pixel-jelly-icon:after{content:'';position:absolute;left:8px;top:8px;width:2px;height:2px;background:#294f67;box-shadow:7px 0 #294f67}
+.pixel-coin-icon:before{content:'';position:absolute;inset:4px;background:#9bbdc4;border:3px solid #416b7c;box-shadow:3px 3px #6e9aa8}
+.pixel-camera-icon:before{content:'';position:absolute;left:2px;top:7px;width:20px;height:13px;background:#6899a9;border:3px solid #294f67}
+.pixel-camera-icon:after{content:'';position:absolute;left:9px;top:11px;width:6px;height:6px;background:#d4e7e8;border:2px solid #294f67}
+.jellydex-launch,.button.primary,.scan-upload,.upgrade-button{background:#497b96;color:#f2f2f2}
+.jellydex-overlay{background:#171717cc}.jellydex-game{background:#d5e8eb;color:#171717;border-color:#355d73;border-radius:4px}.jellydex-head{background:#a8cbd2}.jellydex-tabs{background:#294f67}.jellydex-tabs button.active,.jellydex-tabs button:hover{background:#6b9eaf;color:#f2f2f2}.game-hero{background:#e5eff0;box-shadow:4px 4px 0 #9abdc5}.game-orb{background:#6a9eaf;border-radius:0;box-shadow:inset -10px -12px #315e7666}.game-orb>b{display:block;background:#9bbdc4;color:#294f67;padding:4px 8px;font-size:13px}
+.shop-item span{font-size:0}.shop-item span:before{content:'◆';font-size:24px;color:#6b9eaf}.avatar{font-size:0}.avatar:before{content:'●';font-size:55px;color:#6b9eaf}
+.game-orb{font-size:0}.game-orb .pixel-jelly-icon{width:70px;height:70px;transform:scale(1.7)}.game-orb b{font-size:13px}
+.scan-upload>span{font-size:0}.scan-upload>span:after{content:'사진으로 해파리 인증';font-size:13px;vertical-align:middle}
+.upgrade-button b{font-size:0}.upgrade-button b:after{content:'코인 300';font-size:12px}
+.jellydex-launch{font-size:0}.jellydex-launch:after{content:'JellyDex 게임';font-size:12px}
+.jellydex-head h2{font-size:0}.jellydex-head h2:after{content:'JellyDex';font-size:32px;vertical-align:middle}
+.coin-pill{font-size:0}.coin-pill strong{font-size:14px}.pixel-kicker{color:#416d7f}

@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   </head>
   <body>
-    <button class="jellydex-launch" id="jellydexLaunch" type="button">🪼 JellyDex 게임</button>
+    <button class="jellydex-launch" id="jellydexLaunch" type="button"><span class="pixel-icon pixel-jelly-icon" aria-hidden="true"></span> JellyDex 게임</button>
     <div class="app-shell">
       <header class="topbar">
         <a class="brand" href="#top"><span class="brand-mark">✦</span> JELLYWATCH</a>
@@ -73,7 +73,7 @@
     <div class="jellydex-overlay" id="jellydexOverlay" aria-hidden="true">
       <div class="jellydex-game" role="dialog" aria-modal="true" aria-labelledby="jellydexTitle">
         <button class="jellydex-close" id="jellydexClose" type="button" aria-label="게임 닫기">×</button>
-        <header class="jellydex-head"><div><span class="pixel-kicker">PIXEL OCEAN / BUSAN</span><h2 id="jellydexTitle">🪼 JellyDex</h2><p>발견하고, 키우고, 나만의 수조를 꾸며요.</p></div><div class="coin-pill">🪙 <strong id="coinCount">0</strong></div></header>
+        <header class="jellydex-head"><div><span class="pixel-kicker">도트 바다 / 부산</span><h2 id="jellydexTitle"><span class="pixel-icon pixel-jelly-icon" aria-hidden="true"></span> JellyDex</h2><p>발견하고, 키우고, 나만의 수조를 꾸며요.</p></div><div class="coin-pill"><span class="pixel-icon pixel-coin-icon" aria-hidden="true"></span> <strong id="coinCount">0</strong></div></header>
         <nav class="jellydex-tabs" aria-label="JellyDex 메뉴"><button class="active" data-game-tab="home">홈</button><button data-game-tab="tank">수조</button><button data-game-tab="dex">도감</button><button data-game-tab="shop">상점</button><button data-game-tab="profile">프로필</button></nav>
         <main class="jellydex-content" id="jellydexContent"></main>
       </div>
