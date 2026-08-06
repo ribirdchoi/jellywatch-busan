@@ -137,7 +137,7 @@ function addNearbyCareMarkers() {
   if (!currentMap) return;
   nearbyCarePlaces.forEach((place) => {
     const iconClass = place.type === '병원' ? 'hospital-pin' : 'health-center-pin';
-    const icon = L.divIcon({ className: `care-marker ${iconClass}`, html: '<span></span>', iconSize: [24, 24], iconAnchor: [12, 12] });
+    const icon = L.divIcon({ className: `care-marker ${iconClass}`, html: '<span aria-hidden="true"></span>', iconSize: [32, 32], iconAnchor: [16, 16] });
     const marker = L.marker([place.lat, place.lng], { icon }).addTo(currentMap);
     const renderPopup = () => {
       const distance = currentLocation ? distanceInMeters(currentLocation.latitude, currentLocation.longitude, place.lat, place.lng) : null;
@@ -151,6 +151,7 @@ function addNearbyCareMarkers() {
 function initRealMap() {
   const mapElement = document.querySelector('.map-card');
   if (!mapElement || typeof L === 'undefined') return;
+  mapElement.insertAdjacentHTML('afterend', '<div class="care-map-legend" aria-label="지도 의료시설 마커 범례"><span><i class="care-legend-icon hospital-legend-icon" aria-hidden="true"></i><b>병원</b><small>빨간 십자가</small></span><span><i class="care-legend-icon health-legend-icon" aria-hidden="true"></i><b>보건소</b><small>초록 십자가</small></span></div>');
   mapElement.innerHTML = '<div id="realMap" aria-label="부산 해안 지도"></div>';
   currentMap = L.map('realMap').setView([35.1587, 129.1603], 12);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(currentMap);
