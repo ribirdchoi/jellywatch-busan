@@ -251,7 +251,6 @@ function initRealMap() {
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
     attribution: '', subdomains: 'abcd', maxZoom: 16, noWrap: true, bounds: koreaBounds, pane: 'overlayPane'
   }).addTo(currentMap);
-  L.circle([35.1796, 129.0756], { radius: 15000, color: '#477e98', weight: 2, fillColor: '#78b9cc', fillOpacity: 0.22, interactive: false }).addTo(currentMap);
   addNearbyCareMarkers();
 }
 
