@@ -30,8 +30,11 @@ async function classifyJellyfishPhoto(file) {
   const model = await jellyfishModelPromise;
   const predictions = await model.classify(image, 5);
   URL.revokeObjectURL(objectUrl);
-  const jellyfish = predictions.find((item) => /jellyfish/i.test(item.className));
-  return { accepted: Boolean(jellyfish && jellyfish.probability >= 0.35), confidence: jellyfish?.probability || 0, label: jellyfish?.className || predictions[0]?.className || '' };
+  const jellyfish = predictions.find((item) => /jellyfish|sea anemone|coral reef|sea cucumber|starfish/i.test(item.className));
+  const topMarine = predictions.find((item) => /sea|marine|ocean|reef|coral|anemone|fish/i.test(item.className));
+  const candidate = jellyfish || topMarine;
+  const threshold = jellyfish ? 0.10 : 0.18;
+  return { accepted: Boolean(candidate && candidate.probability >= threshold), confidence: candidate?.probability || 0, label: candidate?.className || predictions[0]?.className || '' };
 }
 
 function updateLocationStatus(position) {
@@ -108,8 +111,8 @@ document.querySelector('#photoInput').addEventListener('change', (event) => {
       photoValidation = { status: result.accepted ? 'accepted' : 'rejected', confidence: result.confidence, label: result.label };
       verdict.className = `ai-verdict ${result.accepted ? 'is-accepted' : 'is-rejected'}`;
       verdict.textContent = result.accepted
-        ? `해파리 사진으로 확인되었습니다 · 신뢰도 ${Math.round(result.confidence * 100)}%`
-        : '해파리로 확인되지 않았습니다. 해파리가 크게 보이도록 다시 촬영해 주세요.';
+        ? `해파리 또는 유사 해양생물로 인식되었습니다 · 신뢰도 ${Math.round(result.confidence * 100)}%`
+        : '해파리·유사 해양생물로 확인되지 않았습니다. 대상이 크게 보이도록 다시 촬영해 주세요.';
     }).catch(() => {
       photoValidation = { status: 'unavailable', confidence: 0, label: '' };
       verdict.className = 'ai-verdict is-rejected';
