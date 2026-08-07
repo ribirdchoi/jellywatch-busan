@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=official-report-20260807" />
+    <link rel="stylesheet" href="styles.css?v=gps-risk-20260807" />
     <link rel="stylesheet" href="mobile.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   </head>
@@ -59,7 +59,7 @@
 
           <div class="panel map-panel" id="map"><div class="section-heading"><span class="number">02</span><div><span class="eyebrow">LIVE MAP</span><h2>주변 해파리 주의보</h2></div><button class="filter-btn">최근 24시간⌄</button></div>
             <div class="map-card"><div class="map-grid"></div><div class="coastline"></div><div class="map-water-label">BUSAN COAST</div><div class="map-point p1"><span></span><b>광안리</b></div><div class="map-point p2"><span></span><b>해운대</b></div><div class="map-point p3"><span></span><b>송정</b></div><div class="map-legend"><span><i class="dot red"></i>주의</span><span><i class="dot yellow"></i>관찰</span><span><i class="dot blue"></i>안전</span></div></div>
-              <div class="map-footer"><span><i class="dot red"></i> 현재 위치 기준 <strong id="nearbyCount">0곳</strong>의 의료시설</span><button class="text-link" id="mapLocate">내 위치로 이동 <span class="pixel-arrow" aria-hidden="true"></span></button></div><div class="map-permission-guide" id="mapPermissionGuide" role="status" aria-live="polite"><div><span>위치 권한을 허용하면 내 위치와 1km 이내 의료시설을 표시합니다.</span><small>아직 선택하지 않은 경우: 브라우저가 허용·차단 창을 표시합니다.<br>이미 차단한 경우: 주소창의 자물쇠 아이콘 → 위치 → 허용으로 변경 후 다시 요청하세요.<br>휴대폰·태블릿도 해당 브라우저 설정에서 위치 권한을 허용해야 합니다.</small></div><button type="button" id="requestLocationAgain">위치 권한 요청</button></div>
+              <div class="map-footer"><span><i class="dot red"></i> 현재 위치 기준 <strong id="nearbyCount">0곳</strong>의 의료시설</span><button class="text-link" id="mapLocate">내 위치로 이동 <span class="pixel-arrow" aria-hidden="true"></span></button></div><section class="jelly-risk-card" id="jellyRiskCard" aria-live="polite"><span class="risk-dot"></span><div><strong id="jellyRiskTitle">주변 해파리 위험 정보를 확인하는 중입니다.</strong><p id="jellyRiskDetail">위치 권한을 허용하면 주변 10km 신고 기록을 분석합니다.</p></div></section><div class="map-permission-guide" id="mapPermissionGuide" role="status" aria-live="polite"><div><span>위치 권한을 허용하면 내 위치와 1km 이내 의료시설을 표시합니다.</span><small>아직 선택하지 않은 경우: 브라우저가 허용·차단 창을 표시합니다.<br>이미 차단한 경우: 주소창의 자물쇠 아이콘 → 위치 → 허용으로 변경 후 다시 요청하세요.<br>휴대폰·태블릿도 해당 브라우저 설정에서 위치 권한을 허용해야 합니다.</small></div><button type="button" id="requestLocationAgain">위치 권한 요청</button></div>
           </div>
         </section>
 
@@ -95,6 +95,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
     <script src="firebase-client.js?v=location-permission-20260807"></script>
     <script src="jelly-auth.js?v=location-permission-20260807"></script>
-    <script src="app.js?v=roboflow-20260807"></script>
+    <script src="app.js?v=gps-risk-20260807"></script>
   </body>
 </html>
