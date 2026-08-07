@@ -112,7 +112,7 @@ function updateLocationStatus(position) {
     if (currentUserMarker) currentUserMarker.setLatLng(point);
     else currentUserMarker = L.circleMarker(point, { radius: 9, stroke: false, fillColor: '#e7473f', fillOpacity: 1 }).addTo(currentMap);
     if (currentUserRadius) currentUserRadius.setLatLng(point);
-    else currentUserRadius = L.circle(point, { radius: 1000, color: '#e7473f', weight: 2, fillColor: '#e7473f', fillOpacity: 0.08, interactive: false }).addTo(currentMap);
+    else currentUserRadius = L.circle(point, { radius: 10000, color: '#e7473f', weight: 2, fillColor: '#e7473f', fillOpacity: 0.08, interactive: false }).addTo(currentMap);
     if (centerMapOnNextLocation) {
       currentMap.setView(point, Math.max(currentMap.getZoom(), 14), { animate: false });
       centerMapOnNextLocation = false;
@@ -120,7 +120,7 @@ function updateLocationStatus(position) {
     addNearbyCareMarkers();
     loadNearbyCarePlaces();
   }
-  setMapPermissionGuide(`내 위치를 확인했습니다 · 반경 1km 피부과·응급실을 표시합니다.`);
+  setMapPermissionGuide(`내 위치를 확인했습니다 · 반경 10km 피부과·응급실을 표시합니다.`);
   updateJellyfishRisk();
 }
 
@@ -234,7 +234,7 @@ async function loadNearbyCarePlaces() {
   if (queryKey === lastCareQueryKey) return;
   lastCareQueryKey = queryKey;
   const { latitude: lat, longitude: lng } = currentLocation;
-  const span = 0.025;
+  const span = 0.12;
   const area = `(${lat - span},${lng - span},${lat + span},${lng + span})`;
   const query = `[out:json][timeout:12];(nwr[amenity=hospital][emergency~"yes|designated",i]${area};nwr[amenity=clinic][emergency=yes]${area};nwr[healthcare=doctor]["healthcare:speciality"~"dermatology|피부과",i]${area};nwr[healthcare=doctor][medical_speciality~"dermatology|피부과",i]${area};nwr[name~"피부과",i]${area};nwr[name~"응급",i]${area};);out center tags;`;
   try {
@@ -306,7 +306,7 @@ function addNearbyCareMarkers(force = false) {
   if (!nearbyCareLayer) nearbyCareLayer = L.layerGroup().addTo(currentMap);
   nearbyCareLayer.clearLayers();
   const nearbyPlaces = currentLocation
-    ? nearbyCarePlaces.filter((place) => distanceInMeters(currentLocation.latitude, currentLocation.longitude, place.lat, place.lng) <= 1000)
+    ? nearbyCarePlaces.filter((place) => distanceInMeters(currentLocation.latitude, currentLocation.longitude, place.lat, place.lng) <= 10000)
     : [];
   const nearbyCount = document.querySelector('#nearbyCount');
   if (nearbyCount) nearbyCount.textContent = nearbyPlaces.length;
