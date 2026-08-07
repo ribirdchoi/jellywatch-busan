@@ -32,6 +32,15 @@ function setMapPermissionGuide(message, blocked = false) {
 }
 
 async function classifyJellyfishPhoto(file) {
+  if (window.JELLYWATCH_AI_ENDPOINT) {
+    const payload = new FormData();
+    payload.append('image', file, file.name);
+    const response = await fetch(window.JELLYWATCH_AI_ENDPOINT, { method: 'POST', body: payload });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'roboflow_inference_failed');
+    const best = result.predictions?.[0] || {};
+    return { accepted: Boolean(result.is_jellyfish), confidence: Number(result.confidence || 0), label: best.class || result.model_id || '' };
+  }
   if (!window.mobilenet) throw new Error('model_unavailable');
   if (!jellyfishModelPromise) jellyfishModelPromise = window.mobilenet.load({ version: 2, alpha: 1.0 });
   const image = new Image();
