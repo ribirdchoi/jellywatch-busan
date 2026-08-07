@@ -5,3 +5,15 @@ services:
     buildCommand: ""
     staticPublishPath: .
     autoDeploy: true
+  - type: web
+    name: jellywatch-ai
+    runtime: python
+    buildCommand: pip install -r server/requirements.txt
+    startCommand: gunicorn --chdir server app:app
+    envVars:
+      - key: ROBOFLOW_MODEL_ID
+        value: dection_fish-jcecx/1
+      - key: ALLOWED_ORIGIN
+        value: https://ribirdchoi.github.io
+      - key: ROBOFLOW_API_KEY
+        sync: false
