@@ -330,13 +330,13 @@ function addNearbyCareMarkers(force = false) {
 }
 
 const beachRiskZones = [
-  { name: '다대포 해수욕장', lat: 35.0464, lng: 128.9678, radius: 1700 },
-  { name: '송도 해수욕장', lat: 35.0759, lng: 129.0197, radius: 1400 },
-  { name: '광안리 해수욕장', lat: 35.1532, lng: 129.1186, radius: 1700 },
-  { name: '해운대 해수욕장', lat: 35.1587, lng: 129.1604, radius: 1800 },
-  { name: '송정 해수욕장', lat: 35.1802, lng: 129.1996, radius: 1500 },
-  { name: '일광 해수욕장', lat: 35.2615, lng: 129.2322, radius: 1500 },
-  { name: '임랑 해수욕장', lat: 35.3157, lng: 129.2632, radius: 1400 }
+  { name: '다대포 해수욕장', lat: 35.0464, lng: 128.9678, shape: [[35.0419,128.9585],[35.0426,128.9760],[35.0499,128.9788],[35.0510,128.9591]] },
+  { name: '송도 해수욕장', lat: 35.0759, lng: 129.0197, shape: [[35.0724,129.0152],[35.0738,129.0254],[35.0797,129.0244],[35.0790,129.0151]] },
+  { name: '광안리 해수욕장', lat: 35.1532, lng: 129.1186, shape: [[35.1492,129.1127],[35.1502,129.1273],[35.1575,129.1281],[35.1581,129.1146]] },
+  { name: '해운대 해수욕장', lat: 35.1587, lng: 129.1604, shape: [[35.1549,129.1532],[35.1554,129.1700],[35.1618,129.1694],[35.1622,129.1540]] },
+  { name: '송정 해수욕장', lat: 35.1802, lng: 129.1996, shape: [[35.1772,129.1939],[35.1778,129.2054],[35.1828,129.2055],[35.1835,129.1953]] },
+  { name: '일광 해수욕장', lat: 35.2615, lng: 129.2322, shape: [[35.2580,129.2260],[35.2587,129.2382],[35.2652,129.2381],[35.2657,129.2268]] },
+  { name: '임랑 해수욕장', lat: 35.3157, lng: 129.2632, shape: [[35.3126,129.2579],[35.3131,129.2690],[35.3187,129.2694],[35.3191,129.2585]] }
 ];
 
 function updateBeachRiskZones(reports = []) {
@@ -349,8 +349,8 @@ function updateBeachRiskZones(reports = []) {
     const level = count >= 3 ? 'alert' : count >= 1 ? 'watch' : 'safe';
     const levelName = level === 'alert' ? '주의' : level === 'watch' ? '관찰' : '안전';
     const color = colors[level];
-    L.circle([beach.lat, beach.lng], {
-      radius: beach.radius, color, weight: 2, fillColor: color, fillOpacity: 0.28, interactive: true
+    L.polygon(beach.shape, {
+      color, weight: 2, fillColor: color, fillOpacity: 0.38, interactive: true
     }).bindPopup(`<div class="beach-risk-popup"><strong>${beach.name}</strong><b class="risk-${level}">해파리 위험도: ${levelName}</b><small>최근 실시간 신고 ${count}건을 반영했습니다.</small></div>`).addTo(beachRiskLayer);
   });
 }
