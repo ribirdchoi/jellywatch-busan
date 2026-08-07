@@ -160,7 +160,18 @@ function initRealMap() {
   if (!mapElement || typeof L === 'undefined') return;
   mapElement.insertAdjacentHTML('afterend', '<div class="care-map-legend" aria-label="지도 의료시설 마커 범례"><span><i class="care-legend-icon hospital-legend-icon" aria-hidden="true"></i><b>병원</b><small>빨간 십자가</small></span><span><i class="care-legend-icon health-legend-icon" aria-hidden="true"></i><b>보건소</b><small>초록 십자가</small></span></div>');
   mapElement.innerHTML = '<div id="realMap" aria-label="부산 해안 지도"></div>';
-  currentMap = L.map('realMap').setView([35.1587, 129.1603], 12);
+  currentMap = L.map('realMap', {
+    zoomAnimation: false,
+    fadeAnimation: false,
+    markerZoomAnimation: false,
+    zoomSnap: 1,
+    zoomDelta: 1,
+    inertia: true,
+    inertiaDeceleration: 4200,
+    inertiaMaxSpeed: 3000,
+    wheelDebounceTime: 20,
+    wheelPxPerZoomLevel: 90
+  }).setView([35.1587, 129.1603], 12);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(currentMap);
   addNearbyCareMarkers();
 }
