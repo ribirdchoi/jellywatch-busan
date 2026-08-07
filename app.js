@@ -451,6 +451,12 @@ function renderGame(tab = 'home') {
   } else {
     jellydexContent.innerHTML = `<section class="profile-card"><div class="avatar"><span class="pixel-explorer" aria-hidden="true"></span></div><span class="pixel-kicker">JELLY TRAINER</span><h3>바다 탐험가</h3><p>해파리 ${jellyDexState.jellies.length}마리 · 수조 레벨 ${jellyDexState.tankLevel}</p><div class="profile-stats"><span><b>${jellyDexState.coins}</b>코인</span><span><b>${jellyDexState.items.length}</b>장식</span></div></section>`;
   }
+  if (tab === 'tank') {
+    document.querySelectorAll('.tank-jelly').forEach((jelly, index) => {
+      jelly.classList.add(`tank-slot-${index + 1}`);
+      jelly.hidden = index >= 5;
+    });
+  }
   document.querySelectorAll('[data-game-tab]').forEach(btn => btn.onclick = () => { document.querySelectorAll('.jellydex-tabs button').forEach(b => b.classList.toggle('active', b.dataset.gameTab === btn.dataset.gameTab)); renderGame(btn.dataset.gameTab); });
 }
 function authenticateJelly(event) {
