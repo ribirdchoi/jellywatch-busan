@@ -250,7 +250,8 @@ function addNearbyCareMarkers() {
     const renderPopup = () => {
       const distance = currentLocation ? distanceInMeters(currentLocation.latitude, currentLocation.longitude, place.lat, place.lng) : null;
       const open = isCurrentlyOpen(place);
-      marker.bindPopup(`<div class="care-popup"><strong>${place.name}</strong><span class="care-type">${place.type}</span><b class="open-status ${open ? 'is-open' : 'is-closed'}">${open ? '현재 운영 중' : '현재 운영 종료'}</b><small>${place.hours}</small>${distance === null ? '' : `<small>내 위치에서 약 ${(distance / 1000).toFixed(1)}km</small>`}<a href="tel:${place.tel}">${place.tel}</a></div>`).openPopup();
+      const mapUrl = `https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}`;
+      marker.bindPopup(`<div class="care-popup"><strong>${place.name}</strong><span class="care-type">${place.type}</span><b class="open-status ${open ? 'is-open' : 'is-closed'}">${open ? '현재 운영 중' : '현재 운영 종료'}</b><small>${place.hours}</small>${distance === null ? '' : `<small>내 위치에서 약 ${(distance / 1000).toFixed(1)}km</small>`}<a href="tel:${place.tel}">${place.tel}</a><a class="google-map-link" href="${mapUrl}" target="_blank" rel="noopener noreferrer">Google 지도에서 보기</a></div>`).openPopup();
     };
     marker.on('click', renderPopup);
   });
