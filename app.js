@@ -16,7 +16,23 @@ let currentMap = null;
 let currentUserMarker = null;
 let currentLocationArrow = null;
 let locationWatchId = null;
+let jellyfishModelPromise = null;
+let photoValidation = { status: 'idle', confidence: 0, label: '' };
 const locationOptions = { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 };
+
+async function classifyJellyfishPhoto(file) {
+  if (!window.mobilenet) throw new Error('model_unavailable');
+  if (!jellyfishModelPromise) jellyfishModelPromise = window.mobilenet.load({ version: 2, alpha: 1.0 });
+  const image = new Image();
+  const objectUrl = URL.createObjectURL(file);
+  image.src = objectUrl;
+  await image.decode();
+  const model = await jellyfishModelPromise;
+  const predictions = await model.classify(image, 5);
+  URL.revokeObjectURL(objectUrl);
+  const jellyfish = predictions.find((item) => /jellyfish/i.test(item.className));
+  return { accepted: Boolean(jellyfish && jellyfish.probability >= 0.35), confidence: jellyfish?.probability || 0, label: jellyfish?.className || predictions[0]?.className || '' };
+}
 
 function updateLocationStatus(position) {
   currentLocation = {
@@ -82,13 +98,31 @@ document.querySelector('#photoInput').addEventListener('change', (event) => {
   const file = event.target.files[0];
   if (file) {
     document.querySelector('#uploadTitle').textContent = file.name;
-    document.querySelector('#uploadHint').textContent = '사진이 추가되었습니다 · GPS 위치를 함께 기록합니다';
+    const verdict = document.querySelector('#aiVerdict');
+    photoValidation = { status: 'checking', confidence: 0, label: '' };
+    verdict.hidden = false;
+    verdict.className = 'ai-verdict is-checking';
+    verdict.textContent = '기기 안에서 사진을 확인하고 있습니다. 사진은 외부로 전송되지 않습니다.';
+    document.querySelector('#uploadHint').textContent = '해파리 사진인지 확인한 뒤 GPS 위치를 함께 기록합니다';
+    classifyJellyfishPhoto(file).then((result) => {
+      photoValidation = { status: result.accepted ? 'accepted' : 'rejected', confidence: result.confidence, label: result.label };
+      verdict.className = `ai-verdict ${result.accepted ? 'is-accepted' : 'is-rejected'}`;
+      verdict.textContent = result.accepted
+        ? `해파리 사진으로 확인되었습니다 · 신뢰도 ${Math.round(result.confidence * 100)}%`
+        : '해파리로 확인되지 않았습니다. 해파리가 크게 보이도록 다시 촬영해 주세요.';
+    }).catch(() => {
+      photoValidation = { status: 'unavailable', confidence: 0, label: '' };
+      verdict.className = 'ai-verdict is-rejected';
+      verdict.textContent = '사진 판별을 시작하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 촬영해 주세요.';
+    });
     refreshPreciseLocation();
   }
 });
 
 document.querySelector('#reportForm').addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (photoValidation.status === 'checking') { showToast('사진 판별이 끝난 뒤 신고해 주세요.'); return; }
+  if (photoValidation.status !== 'accepted') { showToast('해파리 사진으로 확인된 경우에만 신고할 수 있습니다.'); return; }
   if (!currentLocation) {
     showToast('정확한 위치를 확인한 뒤 다시 신고해 주세요.');
     refreshPreciseLocation();
@@ -100,6 +134,9 @@ document.querySelector('#reportForm').addEventListener('submit', async (event) =
     latitude: currentLocation.latitude,
     longitude: currentLocation.longitude,
     accuracyMeters: currentLocation.accuracy,
+    aiVerified: true,
+    aiConfidence: photoValidation.confidence,
+    aiLabel: photoValidation.label,
     measuredAt: currentLocation.measuredAt,
     submittedAt: new Date().toISOString()
   };
