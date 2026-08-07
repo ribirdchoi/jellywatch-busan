@@ -433,6 +433,27 @@ window.jellyDexApplyCloudState = (remote) => {
 };
 const jellydexContent = document.querySelector('#jellydexContent');
 const jellyfishMarkup = (jelly, extra = '') => `<button class="pixel-jelly jelly-${jelly.colorIndex}" data-jelly-id="${jelly.id}" style="--jelly-scale:${1 + jelly.affection / 250}" aria-label="${jelly.name} 쓰다듬기"><span class="pixel-cap"></span><i></i><i></i><i></i><i></i></button><strong class="jelly-name">${jelly.name}</strong>${extra}`;
+const JELLY_DEX_TYPES = [
+  { name: '산호빛 해파리', colorIndex: 0 }, { name: '노을 해파리', colorIndex: 1 },
+  { name: '햇살 해파리', colorIndex: 2 }, { name: '해초 해파리', colorIndex: 3 },
+  { name: '물결 해파리', colorIndex: 4 }, { name: '푸른밤 해파리', colorIndex: 5 },
+  { name: '보랏빛 해파리', colorIndex: 6 }, { name: '분홍별 해파리', colorIndex: 7 },
+  { name: '진주 해파리', colorIndex: 8 }, { name: '오로라 해파리', colorIndex: 4 }
+];
+const jellySpeciesIndex = (jelly) => {
+  if (Number.isInteger(jelly.speciesIndex)) return jelly.speciesIndex % JELLY_DEX_TYPES.length;
+  return [...String(jelly.id || jelly.name || '')].reduce((total, char) => total + char.charCodeAt(0), 0) % JELLY_DEX_TYPES.length;
+};
+function renderJellyDexGrid() {
+  const grid = document.querySelector('.dex-grid');
+  if (!grid) return;
+  grid.innerHTML = JELLY_DEX_TYPES.map((type, index) => {
+    const found = jellyDexState.jellies.find((jelly) => jellySpeciesIndex(jelly) === index);
+    return found
+      ? `<article class="dex-card dex-found">${jellyfishMarkup(found)}<strong>${type.name}</strong><small>${found.acquiredAt} · ${found.color}</small><span>친밀도 ${found.affection} · ${found.stage}</span></article>`
+      : `<article class="dex-card dex-unknown" aria-label="미발견 해파리"><span class="pixel-jelly dex-silhouette" aria-hidden="true"><span class="pixel-cap"></span><i></i><i></i><i></i><i></i></span><strong>???</strong><small>미발견 해파리</small><span>발견하면 도감에 등록됩니다</span></article>`;
+  }).join('');
+}
 function renderGame(tab = 'home') {
   document.querySelector('#coinCount').textContent = jellyDexState.coins;
   const capacity = TANK_CAPACITY[jellyDexState.tankLevel - 1];
@@ -457,6 +478,7 @@ function renderGame(tab = 'home') {
       jelly.hidden = index >= 5;
     });
   }
+  if (tab === 'dex') renderJellyDexGrid();
   document.querySelectorAll('[data-game-tab]').forEach(btn => btn.onclick = () => { document.querySelectorAll('.jellydex-tabs button').forEach(b => b.classList.toggle('active', b.dataset.gameTab === btn.dataset.gameTab)); renderGame(btn.dataset.gameTab); });
 }
 function authenticateJelly(event) {
