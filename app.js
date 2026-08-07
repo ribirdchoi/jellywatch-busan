@@ -192,6 +192,8 @@ function initRealMap() {
   addNearbyCareMarkers();
 }
 
+initRealMap();
+
 
 // JellyDex: GitHub Pages에서도 동작하는 브라우저 저장형 수집 게임
 const JELLY_COLORS = ['빨강', '주황', '노랑', '초록', '하늘색', '파랑', '보라', '분홍', '흰색'];
