@@ -17,6 +17,7 @@ let currentMap = null;
 let currentUserMarker = null;
 let currentUserRadius = null;
 let nearbyCareLayer = null;
+let stopRiskSubscription = null;
 let locationWatchId = null;
 let jellyfishModelPromise = null;
 let photoValidation = { status: 'idle', confidence: 0, label: '' };
@@ -29,6 +30,38 @@ function setMapPermissionGuide(message, blocked = false) {
   if (label) label.textContent = message;
   mapPermissionGuide.classList.toggle('is-blocked', blocked);
   if (button) button.textContent = blocked ? '위치 권한 다시 요청' : '내 위치 다시 확인';
+}
+
+function updateJellyfishRisk() {
+  const title = document.querySelector('#jellyRiskTitle');
+  const detail = document.querySelector('#jellyRiskDetail');
+  const card = document.querySelector('#jellyRiskCard');
+  if (!title || !detail || !card) return;
+  if (!currentLocation) {
+    title.textContent = '주변 해파리 위험 정보를 확인하려면 위치 권한이 필요합니다.';
+    detail.textContent = '위치 권한을 허용하면 현재 위치 반경 10km의 신고 기록을 분석합니다.';
+    return;
+  }
+  title.textContent = '주변 해파리 위험 정보를 분석하는 중입니다.';
+  detail.textContent = '현재 위치 반경 10km의 확인된 신고 기록을 불러오고 있습니다.';
+  stopRiskSubscription?.();
+  window.jellyFirebaseReady?.then((firebase) => {
+    if (!firebase?.ready || !firebase.subscribeReports) {
+      title.textContent = '주변 해파리 신고 데이터 연결을 확인할 수 없습니다.';
+      detail.textContent = '공식 해파리 신고 웹 또는 지자체 안전 안내를 함께 확인해 주세요.';
+      return;
+    }
+    stopRiskSubscription = firebase.subscribeReports((reports) => {
+      const nearby = reports.filter((report) => report.latitude && report.longitude && distanceInMeters(currentLocation.latitude, currentLocation.longitude, Number(report.latitude), Number(report.longitude)) <= 10000);
+      const risk = nearby.length >= 3 ? '주의' : nearby.length >= 1 ? '관찰' : '안전';
+      card.dataset.risk = risk;
+      title.textContent = `주변 해파리 위험도: ${risk}`;
+      detail.textContent = nearby.length ? `현재 위치 반경 10km 안에 확인된 신고 ${nearby.length}건이 있습니다.` : '현재 위치 반경 10km 안에 확인된 신고가 없습니다.';
+    }, () => {
+      title.textContent = '주변 해파리 신고 데이터를 불러오지 못했습니다.';
+      detail.textContent = '네트워크를 확인한 뒤 다시 시도해 주세요.';
+    });
+  });
 }
 
 async function classifyJellyfishPhoto(file) {
@@ -78,6 +111,7 @@ function updateLocationStatus(position) {
     addNearbyCareMarkers();
   }
   setMapPermissionGuide(`내 위치를 확인했습니다 · 반경 1km 의료시설을 표시합니다.`);
+  updateJellyfishRisk();
 }
 
 function refreshPreciseLocation() {
