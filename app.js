@@ -7,7 +7,7 @@ const showToast = (message) => {
 
 // 실제 지자체 접수 API가 생기면 이 주소를 배포 환경의 API 주소로 설정합니다.
 const MUNICIPAL_REPORT_ENDPOINT = '';
-const locationStatus = document.querySelector('#locationStatus');
+const locationStatus = document.querySelector('#locationStatus') || { textContent: '' };
 const mapPermissionGuide = document.querySelector('#mapPermissionGuide');
 const latitude = document.querySelector('#latitude');
 const longitude = document.querySelector('#longitude');
@@ -103,9 +103,9 @@ function updateLocationStatus(position) {
     accuracy: Math.round(position.coords.accuracy),
     measuredAt: new Date().toISOString()
   };
-  latitude.textContent = currentLocation.latitude.toFixed(6);
-  longitude.textContent = currentLocation.longitude.toFixed(6);
-  accuracy.textContent = `${currentLocation.accuracy}m`;
+  if (latitude) latitude.textContent = currentLocation.latitude.toFixed(6);
+  if (longitude) longitude.textContent = currentLocation.longitude.toFixed(6);
+  if (accuracy) accuracy.textContent = `${currentLocation.accuracy}m`;
   locationStatus.textContent = `⌖ 위치 확인 완료 · 오차 약 ${currentLocation.accuracy}m`;
   if (currentMap && typeof L !== 'undefined') {
     const point = [currentLocation.latitude, currentLocation.longitude];
@@ -160,7 +160,7 @@ async function submitReport(report) {
   }
 }
 
-document.querySelector('#photoInput').addEventListener('change', (event) => {
+document.querySelector('#photoInput')?.addEventListener('change', (event) => {
   const file = event.target.files[0];
   if (file) {
     document.querySelector('#uploadTitle').textContent = file.name;
@@ -185,7 +185,7 @@ document.querySelector('#photoInput').addEventListener('change', (event) => {
   }
 });
 
-document.querySelector('#reportForm').addEventListener('submit', async (event) => {
+document.querySelector('#reportForm')?.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (photoValidation.status === 'checking') { showToast('사진 판별이 끝난 뒤 신고해 주세요.'); return; }
   if (photoValidation.status !== 'accepted') { showToast('해파리 사진으로 확인된 경우에만 신고할 수 있습니다.'); return; }
