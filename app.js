@@ -327,7 +327,8 @@ function initRealMap() {
     maxBoundsViscosity: 1,
     minZoom: 7,
     maxZoom: 16,
-    worldCopyJump: false
+    worldCopyJump: false,
+    zoomControl: false
   }).setView([35.1796, 129.0756], 10);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
