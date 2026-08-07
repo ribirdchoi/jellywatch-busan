@@ -59,7 +59,7 @@ function updateLocationStatus(position) {
     }
     if (currentUserMarker) currentUserMarker.setLatLng(point);
     else currentUserMarker = L.circleMarker(point, { radius: 8, color: '#16313d', fillColor: '#95e7e0', fillOpacity: 1 }).addTo(currentMap);
-    currentMap.setView(point, 16);
+    currentMap.setView(point, Math.max(currentMap.getZoom(), 14), { animate: false });
   }
 }
 
@@ -228,11 +228,12 @@ function initRealMap() {
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
     attribution: '', subdomains: 'abcd', maxZoom: 16, noWrap: true, bounds: koreaBounds, pane: 'overlayPane'
   }).addTo(currentMap);
-  L.circle([35.1796, 129.0756], { radius: 30000, color: '#477e98', weight: 2, fillColor: '#78b9cc', fillOpacity: 0.22, interactive: false }).addTo(currentMap);
+  L.circle([35.1796, 129.0756], { radius: 15000, color: '#477e98', weight: 2, fillColor: '#78b9cc', fillOpacity: 0.22, interactive: false }).addTo(currentMap);
   addNearbyCareMarkers();
 }
 
 initRealMap();
+refreshPreciseLocation();
 
 
 // JellyDex: GitHub Pages에서도 동작하는 브라우저 저장형 수집 게임
