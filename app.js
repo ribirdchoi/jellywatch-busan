@@ -220,11 +220,12 @@ document.querySelector('#locateBtn').addEventListener('click', requestAndCenterL
 document.querySelector('#mapLocate').addEventListener('click', requestAndCenterLocation);
 document.querySelector('#requestLocationAgain')?.addEventListener('click', refreshPreciseLocation);
 
-let nearbyCarePlaces = [
+const defaultNearbyCarePlaces = [
   { name: '좋은강안병원 응급실', type: '응급실', lat: 35.1538, lng: 129.1122, hours: '24시간 운영', openDays: [0, 1, 2, 3, 4, 5, 6], openStart: 0, openEnd: 24, tel: '051-625-0900' },
   { name: '부산성모병원 응급실', type: '응급실', lat: 35.1328, lng: 129.1112, hours: '24시간 운영', openDays: [0, 1, 2, 3, 4, 5, 6], openStart: 0, openEnd: 24, tel: '051-933-7114' },
   { name: '광안리 피부과', type: '피부과', lat: 35.1534, lng: 129.1181, hours: '운영 시간은 전화로 확인하세요', openDays: null, tel: '전화번호 정보 확인 필요' }
 ];
+let nearbyCarePlaces = [...defaultNearbyCarePlaces];
 let lastCareQueryKey = '';
 
 async function loadNearbyCarePlaces() {
@@ -233,15 +234,18 @@ async function loadNearbyCarePlaces() {
   if (queryKey === lastCareQueryKey) return;
   lastCareQueryKey = queryKey;
   const { latitude: lat, longitude: lng } = currentLocation;
-  const span = 0.015;
+  const span = 0.025;
   const area = `(${lat - span},${lng - span},${lat + span},${lng + span})`;
-  const query = `[out:json][timeout:25];(nwr[amenity=hospital][emergency~"yes|designated",i]${area};nwr[amenity=clinic][emergency=yes]${area};nwr[healthcare=doctor]["healthcare:speciality"~"dermatology|피부과",i]${area};nwr[healthcare=doctor][medical_speciality~"dermatology|피부과",i]${area};nwr[amenity=clinic][name~"피부과",i]${area};nwr[healthcare=clinic][name~"피부과",i]${area};);out center tags;`;
+  const query = `[out:json][timeout:12];(nwr[amenity=hospital][emergency~"yes|designated",i]${area};nwr[amenity=clinic][emergency=yes]${area};nwr[healthcare=doctor]["healthcare:speciality"~"dermatology|피부과",i]${area};nwr[healthcare=doctor][medical_speciality~"dermatology|피부과",i]${area};nwr[name~"피부과",i]${area};nwr[name~"응급",i]${area};);out center tags;`;
   try {
     const sources = ['https://overpass.kumi.systems/api/interpreter', 'https://overpass-api.de/api/interpreter'];
     let data = null;
     for (const source of sources) {
       try {
-        const response = await fetch(`${source}?data=${encodeURIComponent(query)}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const response = await fetch(`${source}?data=${encodeURIComponent(query)}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
         if (response.ok) { data = await response.json(); break; }
       } catch (error) { console.warn('의료시설 데이터 서버 재시도', error); }
     }
@@ -261,7 +265,15 @@ async function loadNearbyCarePlaces() {
         openEnd: emergency ? 24 : undefined
       };
     }).filter((place) => Number.isFinite(place.lat) && Number.isFinite(place.lng));
-    if (places.length) nearbyCarePlaces = places;
+    if (places.length) {
+      const placeKeys = new Set();
+      nearbyCarePlaces = [...defaultNearbyCarePlaces, ...places].filter((place) => {
+        const key = `${place.name}|${place.lat.toFixed(5)}|${place.lng.toFixed(5)}`;
+        if (placeKeys.has(key)) return false;
+        placeKeys.add(key);
+        return true;
+      });
+    }
     addNearbyCareMarkers(true);
   } catch (error) {
     console.warn('주변 의료시설 정보를 불러오지 못했습니다.', error);
