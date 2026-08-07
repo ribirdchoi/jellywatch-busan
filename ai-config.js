@@ -1,2 +1,2 @@
-// Render 배포 후 실제 AI 서버 주소를 설정합니다. API 키는 절대 이 파일에 넣지 마세요.
-window.JELLYWATCH_AI_ENDPOINT = "";
+// API 키는 절대 이 파일에 넣지 마세요. Render 서비스가 다른 주소를 받으면 이 값만 바꾸면 됩니다.
+window.JELLYWATCH_AI_ENDPOINT = "https://jellywatch-ai.onrender.com/infer";
