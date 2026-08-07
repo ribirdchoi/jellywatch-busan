@@ -15,6 +15,7 @@ let currentLocation = null;
 let currentMap = null;
 let currentUserMarker = null;
 let currentLocationArrow = null;
+let nearbyCareLayer = null;
 let locationWatchId = null;
 let jellyfishModelPromise = null;
 let photoValidation = { status: 'idle', confidence: 0, label: '' };
@@ -60,6 +61,7 @@ function updateLocationStatus(position) {
     if (currentUserMarker) currentUserMarker.setLatLng(point);
     else currentUserMarker = L.circleMarker(point, { radius: 8, color: '#16313d', fillColor: '#95e7e0', fillOpacity: 1 }).addTo(currentMap);
     currentMap.setView(point, Math.max(currentMap.getZoom(), 14), { animate: false });
+    addNearbyCareMarkers();
   }
 }
 
@@ -182,10 +184,17 @@ function isCurrentlyOpen(place) {
 
 function addNearbyCareMarkers() {
   if (!currentMap) return;
-  nearbyCarePlaces.forEach((place) => {
+  if (!nearbyCareLayer) nearbyCareLayer = L.layerGroup().addTo(currentMap);
+  nearbyCareLayer.clearLayers();
+  const nearbyPlaces = currentLocation
+    ? nearbyCarePlaces.filter((place) => distanceInMeters(currentLocation.latitude, currentLocation.longitude, place.lat, place.lng) <= 1000)
+    : [];
+  const nearbyCount = document.querySelector('#nearbyCount');
+  if (nearbyCount) nearbyCount.textContent = nearbyPlaces.length;
+  nearbyPlaces.forEach((place) => {
     const iconClass = place.type === '병원' ? 'hospital-pin' : 'health-center-pin';
     const icon = L.divIcon({ className: `care-marker ${iconClass}`, html: '<span aria-hidden="true"></span>', iconSize: [32, 32], iconAnchor: [16, 16] });
-    const marker = L.marker([place.lat, place.lng], { icon }).addTo(currentMap);
+    const marker = L.marker([place.lat, place.lng], { icon }).addTo(nearbyCareLayer);
     const renderPopup = () => {
       const distance = currentLocation ? distanceInMeters(currentLocation.latitude, currentLocation.longitude, place.lat, place.lng) : null;
       const open = isCurrentlyOpen(place);
