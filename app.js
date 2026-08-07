@@ -235,11 +235,17 @@ async function loadNearbyCarePlaces() {
   lastCareQueryKey = queryKey;
   const { latitude: lat, longitude: lng } = currentLocation;
   const span = 0.015;
-  const query = `[out:json][timeout:20];(nwr[amenity=hospital](${lat - span},${lng - span},${lat + span},${lng + span});nwr[healthcare=hospital](${lat - span},${lng - span},${lat + span},${lng + span});nwr[healthcare=centre](${lat - span},${lng - span},${lat + span},${lng + span});nwr[amenity=public_health](${lat - span},${lng - span},${lat + span},${lng + span}););out center tags;`;
+  const query = `[out:json][timeout:25];(nwr[amenity~"hospital|clinic"](${lat - span},${lng - span},${lat + span},${lng + span});nwr[healthcare~"hospital|clinic|centre|doctors"](${lat - span},${lng - span},${lat + span},${lng + span});nwr[amenity=public_health](${lat - span},${lng - span},${lat + span},${lng + span}););out center tags;`;
   try {
-    const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
-    if (!response.ok) throw new Error('care_data_failed');
-    const data = await response.json();
+    const sources = ['https://overpass.kumi.systems/api/interpreter', 'https://overpass-api.de/api/interpreter'];
+    let data = null;
+    for (const source of sources) {
+      try {
+        const response = await fetch(`${source}?data=${encodeURIComponent(query)}`);
+        if (response.ok) { data = await response.json(); break; }
+      } catch (error) { console.warn('의료시설 데이터 서버 재시도', error); }
+    }
+    if (!data) throw new Error('care_data_failed');
     const places = data.elements.map((item) => {
       const tags = item.tags || {};
       const healthCenter = tags.healthcare === 'centre' || tags.amenity === 'public_health';
