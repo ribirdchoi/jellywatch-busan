@@ -222,8 +222,7 @@ document.querySelector('#requestLocationAgain')?.addEventListener('click', refre
 
 const defaultNearbyCarePlaces = [
   { name: '좋은강안병원 응급실', type: '응급실', lat: 35.1538, lng: 129.1122, hours: '24시간 운영', openDays: [0, 1, 2, 3, 4, 5, 6], openStart: 0, openEnd: 24, tel: '051-625-0900' },
-  { name: '부산성모병원 응급실', type: '응급실', lat: 35.1328, lng: 129.1112, hours: '24시간 운영', openDays: [0, 1, 2, 3, 4, 5, 6], openStart: 0, openEnd: 24, tel: '051-933-7114' },
-  { name: '광안리 피부과', type: '피부과', lat: 35.1534, lng: 129.1181, hours: '운영 시간은 전화로 확인하세요', openDays: null, tel: '전화번호 정보 확인 필요' }
+  { name: '부산성모병원 응급실', type: '응급실', lat: 35.1328, lng: 129.1112, hours: '24시간 운영', openDays: [0, 1, 2, 3, 4, 5, 6], openStart: 0, openEnd: 24, tel: '051-933-7114' }
 ];
 let nearbyCarePlaces = [...defaultNearbyCarePlaces];
 let lastCareQueryKey = '';
@@ -258,6 +257,7 @@ async function loadNearbyCarePlaces() {
         type: emergency ? '응급실' : '피부과',
         lat: item.lat ?? item.center?.lat,
         lng: item.lon ?? item.center?.lon,
+        address: [tags['addr:full'], tags['addr:city'], tags['addr:district'], tags['addr:street'], tags['addr:housenumber']].filter(Boolean).join(' ') || '부산광역시',
         hours: emergency ? (tags.opening_hours || '24시간 운영 여부는 전화로 확인하세요') : (tags.opening_hours || '운영 시간은 전화로 확인하세요'),
         tel: tags.phone || tags['contact:phone'] || '전화번호 정보 확인 필요',
         openDays: emergency ? [0, 1, 2, 3, 4, 5, 6] : null,
@@ -319,8 +319,9 @@ function addNearbyCareMarkers(force = false) {
       const open = isCurrentlyOpen(place);
       const operationText = open === null ? '운영 시간 확인 필요' : open ? '현재 운영 중' : '현재 운영 종료';
       const operationClass = open === null ? '' : open ? 'is-open' : 'is-closed';
-      const mapUrl = `https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}`;
-      marker.bindPopup(`<div class="care-popup"><strong>${place.name}</strong><span class="care-type">${place.type}</span><b class="open-status ${operationClass}">${operationText}</b><small>${place.hours}</small>${distance === null ? '' : `<small>내 위치에서 약 ${(distance / 1000).toFixed(1)}km</small>`}${place.tel === '전화번호 정보 확인 필요' ? `<small>${place.tel}</small>` : `<a href="tel:${place.tel}">${place.tel}</a>`}<a class="google-map-link" href="${mapUrl}" target="_blank" rel="noopener noreferrer">Google 지도에서 보기</a></div>`).openPopup();
+      const googleSearch = encodeURIComponent(`${place.name} ${place.address || '부산광역시'}`);
+      const mapUrl = `https://www.google.com/maps/search/?api=1&query=${googleSearch}`;
+      marker.bindPopup(`<div class="care-popup"><strong>${place.name}</strong><span class="care-type">${place.type}</span><b class="open-status ${operationClass}">${operationText}</b><small>${place.hours}</small>${distance === null ? '' : `<small>내 위치에서 약 ${(distance / 1000).toFixed(1)}km</small>`}${place.tel === '전화번호 정보 확인 필요' ? `<small>${place.tel}</small>` : `<a href="tel:${place.tel}">${place.tel}</a>`}<a class="google-map-link" href="${mapUrl}" target="_blank" rel="noopener noreferrer">Google 지도에서 정확한 장소 정보 보기</a></div>`).openPopup();
     };
     marker.on('click', renderPopup);
   });
