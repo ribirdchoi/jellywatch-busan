@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=map-performance-20260807" />
+    <link rel="stylesheet" href="styles.css?v=official-report-only-20260807" />
     <link rel="stylesheet" href="mobile.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   </head>
@@ -19,7 +19,7 @@
     <div class="app-shell">
       <header class="topbar">
         <a class="brand" href="#top"><span class="brand-mark pixel-spark" aria-hidden="true"></span> JELLYWATCH</a>
-        <nav><a href="#report">신고하기</a><a href="#map">지도</a><a href="#first-aid">응급처치</a></nav>
+        <nav><a href="#report">공식 신고</a><a href="#map">지도</a><a href="#first-aid">응급처치</a></nav>
         <button class="location-pill" id="locateBtn"><span class="pixel-location-icon" aria-hidden="true"></span> 내 위치 찾기</button>
       </header>
 
@@ -29,7 +29,7 @@
             <span class="eyebrow">BEACH SAFETY NETWORK</span>
             <h1>해파리를 발견했다면,<br /><em>함께 안전하게</em> 알려주세요.</h1>
             <p>사진 한 장과 위치만 남겨주시면 해수욕장 이용객과 안전요원에게 빠르게 공유됩니다.</p>
-            <div class="hero-actions"><a class="button primary" href="#report">발견 신고하기 <span class="pixel-arrow" aria-hidden="true"></span></a><a class="text-link" href="#first-aid">쏘였을 때 응급처치 보기</a></div>
+            <div class="hero-actions"><a class="button primary" href="#report">공식 신고 웹으로 이어가기 <span class="pixel-arrow" aria-hidden="true"></span></a><a class="text-link" href="#first-aid">쏘였을 때 응급처치 보기</a></div>
           </div>
           <div class="hero-art" aria-label="바다 위에 떠 있는 해파리 일러스트">
             <div class="sun"></div><div class="wave wave-one"></div><div class="wave wave-two"></div>
@@ -41,20 +41,8 @@
         <section class="stats-row"><div><strong>24</strong><span>오늘 접수된 신고</span></div><div><strong>08</strong><span>주의보 발령 해변</span></div><div><strong>13 min</strong><span>평균 대응 시간</span></div><div class="status"><i></i><span>안전요원 네트워크 연결됨</span></div></section>
 
         <section class="content-grid" id="report">
-          <div class="panel report-panel"><div class="section-heading"><span class="number">01</span><div><span class="eyebrow">QUICK REPORT</span><h2>발견 신고하기</h2></div><span class="step">1 / 2</span></div>
-            <form id="reportForm">
-              <label class="upload-box" for="photoInput"><input id="photoInput" type="file" accept="image/*" capture="environment" /><span class="upload-icon pixel-camera-icon" aria-hidden="true"></span><strong id="uploadTitle">사진을 추가해주세요</strong><small id="uploadHint">촬영 시 GPS 위치도 함께 기록됩니다</small></label><p class="ai-verdict" id="aiVerdict" role="status" aria-live="polite" hidden></p>
-              <p class="location-status" id="locationStatus" role="status" aria-live="polite"><span class="pixel-location-icon" aria-hidden="true"></span> 신고 위치를 확인하는 중…</p>
-              <div class="coordinates" id="coordinates" aria-live="polite">
-                <span>위도 <strong id="latitude">측정 전</strong></span>
-                <span>경도 <strong id="longitude">측정 전</strong></span>
-                <span>오차 <strong id="accuracy">-</strong></span>
-              </div>
-              <div class="form-row"><label>발견 장소<input id="placeInput" placeholder="예: 광안리 해수욕장" required /></label><label>발견 시간<select><option>지금</option><option>10분 이내</option><option>1시간 이내</option></select></label></div>
-              <div class="form-row jelly-details"><label>해파리 크기<select id="sizeSelect"><option value="">선택해주세요</option><option>손바닥보다 작음</option><option>손바닥 정도</option><option>성인 상체 정도</option><option>성인보다 큼</option><option>정확히 모르겠음</option></select></label><label>개체 수<select id="countSelect"><option value="">선택해주세요</option><option>1마리</option><option>2~5마리</option><option>6~10마리</option><option>10마리 이상</option><option>정확히 모르겠음</option></select></label></div>
-              <label>추가 메모 <textarea placeholder="주변 상황이나 위험 요소를 알려주세요"></textarea></label>
-              <button class="button dark" type="submit">위치 포함 신고 접수하기 <span class="pixel-arrow" aria-hidden="true"></span></button><p class="fine-print">위치 권한을 허용하면 위도·경도가 신고 데이터에 포함됩니다.</p><div class="official-report-link"><strong>국립수산과학원 공식 신고</strong><p>공식 신고에서는 개인정보 수집·이용과 사진 저작권 동의가 필요합니다.</p><a href="https://www.nifs.go.kr/m_jelly/" target="_blank" rel="noopener noreferrer">공식 해파리 신고 웹으로 이어가기 <span class="pixel-arrow" aria-hidden="true"></span></a></div>
-            </form>
+          <div class="panel official-report-panel"><div class="section-heading"><span class="number">01</span><div><span class="eyebrow">OFFICIAL REPORT</span><h2>공식 해파리 신고</h2></div></div>
+            <div class="official-report-link official-report-link-large"><strong>국립수산과학원 공식 해파리 신고</strong><p>해파리 발견 신고는 국립수산과학원 공식 웹에서 접수할 수 있습니다.</p><a href="https://www.nifs.go.kr/m_jelly/" target="_blank" rel="noopener noreferrer">공식 해파리 신고 웹으로 이어가기 <span class="pixel-arrow" aria-hidden="true"></span></a></div>
           </div>
 
           <div class="panel map-panel" id="map"><div class="section-heading"><span class="number">02</span><div><span class="eyebrow">LIVE MAP</span><h2>주변 해파리 주의보</h2></div><button class="filter-btn">최근 24시간⌄</button></div>
@@ -95,6 +83,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
     <script src="firebase-client.js?v=location-permission-20260807"></script>
     <script src="jelly-auth.js?v=location-permission-20260807"></script>
-    <script src="app.js?v=google-place-search-20260807"></script>
+    <script src="app.js?v=official-report-only-20260807"></script>
   </body>
 </html>
