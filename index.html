@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=korea-map-live-20260807" />
+    <link rel="stylesheet" href="styles.css?v=local-ai-20260807" />
     <link rel="stylesheet" href="mobile.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   </head>
@@ -43,7 +43,7 @@
         <section class="content-grid" id="report">
           <div class="panel report-panel"><div class="section-heading"><span class="number">01</span><div><span class="eyebrow">QUICK REPORT</span><h2>발견 신고하기</h2></div><span class="step">1 / 2</span></div>
             <form id="reportForm">
-              <label class="upload-box" for="photoInput"><input id="photoInput" type="file" accept="image/*" capture="environment" /><span class="upload-icon pixel-camera-icon" aria-hidden="true"></span><strong id="uploadTitle">사진을 추가해주세요</strong><small id="uploadHint">촬영 시 GPS 위치도 함께 기록됩니다</small></label>
+              <label class="upload-box" for="photoInput"><input id="photoInput" type="file" accept="image/*" capture="environment" /><span class="upload-icon pixel-camera-icon" aria-hidden="true"></span><strong id="uploadTitle">사진을 추가해주세요</strong><small id="uploadHint">촬영 시 GPS 위치도 함께 기록됩니다</small></label><p class="ai-verdict" id="aiVerdict" role="status" aria-live="polite" hidden></p>
               <p class="location-status" id="locationStatus" role="status" aria-live="polite"><span class="pixel-location-icon" aria-hidden="true"></span> 신고 위치를 확인하는 중…</p>
               <div class="coordinates" id="coordinates" aria-live="polite">
                 <span>위도 <strong id="latitude">측정 전</strong></span>
@@ -90,9 +90,11 @@
       </div>
     </div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    <script src="firebase-client.js?v=korea-map-live-20260807"></script>
-    <script src="jelly-auth.js?v=korea-map-live-20260807"></script>
-    <script src="app.js?v=korea-map-live-20260807"></script>
-    <script src="care.js?v=korea-map-live-20260807"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+    <script src="firebase-client.js?v=local-ai-20260807"></script>
+    <script src="jelly-auth.js?v=local-ai-20260807"></script>
+    <script src="app.js?v=local-ai-20260807"></script>
+    <script src="care.js?v=local-ai-20260807"></script>
   </body>
 </html>
