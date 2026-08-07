@@ -8,6 +8,7 @@ const showToast = (message) => {
 // 실제 지자체 접수 API가 생기면 이 주소를 배포 환경의 API 주소로 설정합니다.
 const MUNICIPAL_REPORT_ENDPOINT = '';
 const locationStatus = document.querySelector('#locationStatus');
+const mapPermissionGuide = document.querySelector('#mapPermissionGuide');
 const latitude = document.querySelector('#latitude');
 const longitude = document.querySelector('#longitude');
 const accuracy = document.querySelector('#accuracy');
@@ -20,6 +21,15 @@ let locationWatchId = null;
 let jellyfishModelPromise = null;
 let photoValidation = { status: 'idle', confidence: 0, label: '' };
 const locationOptions = { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 };
+
+function setMapPermissionGuide(message, blocked = false) {
+  if (!mapPermissionGuide) return;
+  const label = mapPermissionGuide.querySelector('span');
+  const button = mapPermissionGuide.querySelector('button');
+  if (label) label.textContent = message;
+  mapPermissionGuide.classList.toggle('is-blocked', blocked);
+  if (button) button.textContent = blocked ? '위치 권한 다시 요청' : '내 위치 다시 확인';
+}
 
 async function classifyJellyfishPhoto(file) {
   if (!window.mobilenet) throw new Error('model_unavailable');
@@ -63,6 +73,7 @@ function updateLocationStatus(position) {
     currentMap.setView(point, Math.max(currentMap.getZoom(), 14), { animate: false });
     addNearbyCareMarkers();
   }
+  setMapPermissionGuide(`내 위치를 확인했습니다 · 반경 1km 의료시설을 표시합니다.`);
 }
 
 function refreshPreciseLocation() {
@@ -71,8 +82,10 @@ function refreshPreciseLocation() {
     return;
   }
   locationStatus.textContent = '⌖ 고정밀 GPS 위치를 확인하는 중…';
+  setMapPermissionGuide('위치 권한을 확인하고 있습니다. 잠시만 기다려 주세요.');
   navigator.geolocation.getCurrentPosition(updateLocationStatus, () => {
     locationStatus.textContent = '⌖ 위치 권한을 허용하면 정확한 신고가 가능합니다';
+    setMapPermissionGuide('위치 권한이 차단되어 있습니다. 브라우저 주소창 설정에서 이 사이트의 위치 권한을 허용한 뒤 다시 요청해 주세요.', true);
   }, locationOptions);
   if (locationWatchId === null) {
     locationWatchId = navigator.geolocation.watchPosition(updateLocationStatus, () => {}, locationOptions);
@@ -156,6 +169,7 @@ document.querySelector('#reportForm').addEventListener('submit', async (event) =
 
 document.querySelector('#locateBtn').addEventListener('click', refreshPreciseLocation);
 document.querySelector('#mapLocate').addEventListener('click', refreshPreciseLocation);
+document.querySelector('#requestLocationAgain')?.addEventListener('click', refreshPreciseLocation);
 
 const nearbyCarePlaces = [
   { name: '광안리 보건소', type: '보건소', lat: 35.1539, lng: 129.1185, hours: '평일 09:00–18:00', openDays: [1, 2, 3, 4, 5], openStart: 9, openEnd: 18, tel: '051-000-0000' },
@@ -242,7 +256,7 @@ function initRealMap() {
 }
 
 initRealMap();
-refreshPreciseLocation();
+window.addEventListener('load', () => setTimeout(refreshPreciseLocation, 350), { once: true });
 
 
 // JellyDex: GitHub Pages에서도 동작하는 브라우저 저장형 수집 게임
