@@ -7,6 +7,7 @@
 .map-card #realMap,.map-card .leaflet-container{width:100%;height:100%;overflow:hidden;background:#6faec4;transform:translateZ(0);backface-visibility:hidden}
 .map-card .leaflet-pane,.map-card .leaflet-tile-container{will-change:transform;transform:translateZ(0)}
 .map-card .leaflet-tile{backface-visibility:hidden;image-rendering:auto}
+.map-card .leaflet-tile-container,.map-card .leaflet-zoom-animated{transition:none!important}
 /* 대한민국 지도는 바다를 푸르게, 육지는 차분한 회색으로 유지합니다. */
 .map-card .leaflet-tile-pane{filter:grayscale(.6) saturate(.75) contrast(1.04)}
 .map-card .leaflet-overlay-pane{filter:none}
