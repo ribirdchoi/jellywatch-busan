@@ -218,8 +218,8 @@ document.querySelector('#reportForm')?.addEventListener('submit', async (event) 
 });
 
 const requestAndCenterLocation = () => { centerMapOnNextLocation = true; refreshPreciseLocation(); };
-document.querySelector('#locateBtn').addEventListener('click', requestAndCenterLocation);
-document.querySelector('#mapLocate').addEventListener('click', requestAndCenterLocation);
+document.querySelector('#locateBtn')?.addEventListener('click', requestAndCenterLocation);
+document.querySelector('#mapLocate')?.addEventListener('click', requestAndCenterLocation);
 document.querySelector('#requestLocationAgain')?.addEventListener('click', refreshPreciseLocation);
 
 const defaultNearbyCarePlaces = [
