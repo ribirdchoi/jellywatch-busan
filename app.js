@@ -15,6 +15,7 @@ const accuracy = document.querySelector('#accuracy');
 let currentLocation = null;
 let currentMap = null;
 let currentUserMarker = null;
+let currentUserRadius = null;
 let nearbyCareLayer = null;
 let locationWatchId = null;
 let jellyfishModelPromise = null;
@@ -62,6 +63,8 @@ function updateLocationStatus(position) {
     const point = [currentLocation.latitude, currentLocation.longitude];
     if (currentUserMarker) currentUserMarker.setLatLng(point);
     else currentUserMarker = L.circleMarker(point, { radius: 9, stroke: false, fillColor: '#e7473f', fillOpacity: 1 }).addTo(currentMap);
+    if (currentUserRadius) currentUserRadius.setLatLng(point);
+    else currentUserRadius = L.circle(point, { radius: 1000, color: '#e7473f', weight: 2, fillColor: '#e7473f', fillOpacity: 0.08, interactive: false }).addTo(currentMap);
     currentMap.setView(point, Math.max(currentMap.getZoom(), 14), { animate: false });
     addNearbyCareMarkers();
   }
