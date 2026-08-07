@@ -17,6 +17,7 @@ let currentMap = null;
 let currentUserMarker = null;
 let currentUserRadius = null;
 let nearbyCareLayer = null;
+let beachRiskLayer = null;
 let stopRiskSubscription = null;
 let locationWatchId = null;
 let centerMapOnNextLocation = false;
@@ -60,6 +61,7 @@ function updateJellyfishRisk() {
     stopRiskSubscription = firebase.subscribeReports((reports) => {
       const nearby = reports.filter((report) => report.latitude && report.longitude && distanceInMeters(currentLocation.latitude, currentLocation.longitude, Number(report.latitude), Number(report.longitude)) <= 10000);
       const risk = nearby.length >= 3 ? '주의' : nearby.length >= 1 ? '관찰' : '안전';
+      updateBeachRiskZones(reports);
       card.dataset.risk = risk;
       title.textContent = `주변 해파리 위험도: ${risk}`;
       detail.textContent = nearby.length ? `현재 위치 반경 10km 안에 확인된 신고 ${nearby.length}건이 있습니다.` : '현재 위치 반경 10km 안에 확인된 신고가 없습니다.';
@@ -327,6 +329,32 @@ function addNearbyCareMarkers(force = false) {
   });
 }
 
+const beachRiskZones = [
+  { name: '다대포 해수욕장', lat: 35.0464, lng: 128.9678, radius: 1700 },
+  { name: '송도 해수욕장', lat: 35.0759, lng: 129.0197, radius: 1400 },
+  { name: '광안리 해수욕장', lat: 35.1532, lng: 129.1186, radius: 1700 },
+  { name: '해운대 해수욕장', lat: 35.1587, lng: 129.1604, radius: 1800 },
+  { name: '송정 해수욕장', lat: 35.1802, lng: 129.1996, radius: 1500 },
+  { name: '일광 해수욕장', lat: 35.2615, lng: 129.2322, radius: 1500 },
+  { name: '임랑 해수욕장', lat: 35.3157, lng: 129.2632, radius: 1400 }
+];
+
+function updateBeachRiskZones(reports = []) {
+  if (!currentMap || typeof L === 'undefined') return;
+  if (!beachRiskLayer) beachRiskLayer = L.layerGroup().addTo(currentMap);
+  beachRiskLayer.clearLayers();
+  const colors = { safe: '#28a567', watch: '#e3b72f', alert: '#df4c4c' };
+  beachRiskZones.forEach((beach) => {
+    const count = reports.filter((report) => report.latitude && report.longitude && distanceInMeters(beach.lat, beach.lng, Number(report.latitude), Number(report.longitude)) <= 3500).length;
+    const level = count >= 3 ? 'alert' : count >= 1 ? 'watch' : 'safe';
+    const levelName = level === 'alert' ? '주의' : level === 'watch' ? '관찰' : '안전';
+    const color = colors[level];
+    L.circle([beach.lat, beach.lng], {
+      radius: beach.radius, color, weight: 2, fillColor: color, fillOpacity: 0.28, interactive: true
+    }).bindPopup(`<div class="beach-risk-popup"><strong>${beach.name}</strong><b class="risk-${level}">해파리 위험도: ${levelName}</b><small>최근 실시간 신고 ${count}건을 반영했습니다.</small></div>`).addTo(beachRiskLayer);
+  });
+}
+
 function initRealMap() {
   const mapElement = document.querySelector('.map-card');
   if (!mapElement || typeof L === 'undefined') return;
@@ -361,6 +389,7 @@ function initRealMap() {
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
     attribution: '', subdomains: 'abcd', maxZoom: 16, noWrap: true, bounds: koreaBounds, pane: 'overlayPane'
   }).addTo(currentMap);
+    updateBeachRiskZones();
     addNearbyCareMarkers(true);
 }
 
