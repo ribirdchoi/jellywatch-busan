@@ -19,6 +19,9 @@ let currentUserRadius = null;
 let nearbyCareLayer = null;
 let stopRiskSubscription = null;
 let locationWatchId = null;
+let centerMapOnNextLocation = false;
+let lastCareMarkerLocation = null;
+let lastRiskLocationKey = '';
 let jellyfishModelPromise = null;
 let photoValidation = { status: 'idle', confidence: 0, label: '' };
 const locationOptions = { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 };
@@ -42,6 +45,9 @@ function updateJellyfishRisk() {
     detail.textContent = '위치 권한을 허용하면 현재 위치 반경 10km의 신고 기록을 분석합니다.';
     return;
   }
+  const riskLocationKey = `${currentLocation.latitude.toFixed(3)},${currentLocation.longitude.toFixed(3)}`;
+  if (riskLocationKey === lastRiskLocationKey) return;
+  lastRiskLocationKey = riskLocationKey;
   title.textContent = '주변 해파리 위험 정보를 분석하는 중입니다.';
   detail.textContent = '현재 위치 반경 10km의 확인된 신고 기록을 불러오고 있습니다.';
   stopRiskSubscription?.();
@@ -107,7 +113,10 @@ function updateLocationStatus(position) {
     else currentUserMarker = L.circleMarker(point, { radius: 9, stroke: false, fillColor: '#e7473f', fillOpacity: 1 }).addTo(currentMap);
     if (currentUserRadius) currentUserRadius.setLatLng(point);
     else currentUserRadius = L.circle(point, { radius: 1000, color: '#e7473f', weight: 2, fillColor: '#e7473f', fillOpacity: 0.08, interactive: false }).addTo(currentMap);
-    currentMap.setView(point, Math.max(currentMap.getZoom(), 14), { animate: false });
+    if (centerMapOnNextLocation) {
+      currentMap.setView(point, Math.max(currentMap.getZoom(), 14), { animate: false });
+      centerMapOnNextLocation = false;
+    }
     addNearbyCareMarkers();
     loadNearbyCarePlaces();
   }
@@ -206,8 +215,9 @@ document.querySelector('#reportForm').addEventListener('submit', async (event) =
   }
 });
 
-document.querySelector('#locateBtn').addEventListener('click', refreshPreciseLocation);
-document.querySelector('#mapLocate').addEventListener('click', refreshPreciseLocation);
+const requestAndCenterLocation = () => { centerMapOnNextLocation = true; refreshPreciseLocation(); };
+document.querySelector('#locateBtn').addEventListener('click', requestAndCenterLocation);
+document.querySelector('#mapLocate').addEventListener('click', requestAndCenterLocation);
 document.querySelector('#requestLocationAgain')?.addEventListener('click', refreshPreciseLocation);
 
 let nearbyCarePlaces = [
@@ -244,7 +254,7 @@ async function loadNearbyCarePlaces() {
       };
     }).filter((place) => Number.isFinite(place.lat) && Number.isFinite(place.lng));
     if (places.length) nearbyCarePlaces = places;
-    addNearbyCareMarkers();
+    addNearbyCareMarkers(true);
   } catch (error) {
     console.warn('주변 의료시설 정보를 불러오지 못했습니다.', error);
   }
@@ -269,8 +279,10 @@ function isCurrentlyOpen(place) {
   return place.openDays.includes(now.getDay()) && now.getHours() >= place.openStart && now.getHours() < place.openEnd;
 }
 
-function addNearbyCareMarkers() {
+function addNearbyCareMarkers(force = false) {
   if (!currentMap) return;
+  if (currentLocation && !force && lastCareMarkerLocation && distanceInMeters(currentLocation.latitude, currentLocation.longitude, lastCareMarkerLocation.latitude, lastCareMarkerLocation.longitude) < 80) return;
+  if (currentLocation) lastCareMarkerLocation = { ...currentLocation };
   if (!nearbyCareLayer) nearbyCareLayer = L.layerGroup().addTo(currentMap);
   nearbyCareLayer.clearLayers();
   const nearbyPlaces = currentLocation
@@ -327,7 +339,7 @@ function initRealMap() {
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
     attribution: '', subdomains: 'abcd', maxZoom: 16, noWrap: true, bounds: koreaBounds, pane: 'overlayPane'
   }).addTo(currentMap);
-  addNearbyCareMarkers();
+    addNearbyCareMarkers(true);
 }
 
 initRealMap();
