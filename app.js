@@ -109,6 +109,7 @@ function updateLocationStatus(position) {
     else currentUserRadius = L.circle(point, { radius: 1000, color: '#e7473f', weight: 2, fillColor: '#e7473f', fillOpacity: 0.08, interactive: false }).addTo(currentMap);
     currentMap.setView(point, Math.max(currentMap.getZoom(), 14), { animate: false });
     addNearbyCareMarkers();
+    loadNearbyCarePlaces();
   }
   setMapPermissionGuide(`내 위치를 확인했습니다 · 반경 1km 의료시설을 표시합니다.`);
   updateJellyfishRisk();
@@ -209,12 +210,45 @@ document.querySelector('#locateBtn').addEventListener('click', refreshPreciseLoc
 document.querySelector('#mapLocate').addEventListener('click', refreshPreciseLocation);
 document.querySelector('#requestLocationAgain')?.addEventListener('click', refreshPreciseLocation);
 
-const nearbyCarePlaces = [
+let nearbyCarePlaces = [
   { name: '광안리 보건소', type: '보건소', lat: 35.1539, lng: 129.1185, hours: '평일 09:00–18:00', openDays: [1, 2, 3, 4, 5], openStart: 9, openEnd: 18, tel: '051-000-0000' },
   { name: '수영구 보건소', type: '보건소', lat: 35.1456, lng: 129.1130, hours: '평일 09:00–18:00', openDays: [1, 2, 3, 4, 5], openStart: 9, openEnd: 18, tel: '051-752-4000' },
   { name: '좋은강안병원', type: '병원', lat: 35.1538, lng: 129.1122, hours: '24시간 응급실 운영', openDays: [0, 1, 2, 3, 4, 5, 6], openStart: 0, openEnd: 24, tel: '051-625-0900' },
   { name: '부산성모병원', type: '병원', lat: 35.1328, lng: 129.1112, hours: '24시간 응급실 운영', openDays: [0, 1, 2, 3, 4, 5, 6], openStart: 0, openEnd: 24, tel: '051-933-7114' }
 ];
+let lastCareQueryKey = '';
+
+async function loadNearbyCarePlaces() {
+  if (!currentLocation) return;
+  const queryKey = `${currentLocation.latitude.toFixed(2)},${currentLocation.longitude.toFixed(2)}`;
+  if (queryKey === lastCareQueryKey) return;
+  lastCareQueryKey = queryKey;
+  const { latitude: lat, longitude: lng } = currentLocation;
+  const span = 0.015;
+  const query = `[out:json][timeout:20];(nwr[amenity=hospital](${lat - span},${lng - span},${lat + span},${lng + span});nwr[healthcare=hospital](${lat - span},${lng - span},${lat + span},${lng + span});nwr[healthcare=centre](${lat - span},${lng - span},${lat + span},${lng + span});nwr[amenity=public_health](${lat - span},${lng - span},${lat + span},${lng + span}););out center tags;`;
+  try {
+    const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+    if (!response.ok) throw new Error('care_data_failed');
+    const data = await response.json();
+    const places = data.elements.map((item) => {
+      const tags = item.tags || {};
+      const healthCenter = tags.healthcare === 'centre' || tags.amenity === 'public_health';
+      return {
+        name: tags['name:ko'] || tags.name || (healthCenter ? '보건소' : '병원'),
+        type: healthCenter ? '보건소' : '병원',
+        lat: item.lat ?? item.center?.lat,
+        lng: item.lon ?? item.center?.lon,
+        hours: tags.opening_hours || '운영 시간 정보 확인 필요',
+        tel: tags.phone || tags['contact:phone'] || '전화번호 정보 확인 필요',
+        openDays: null
+      };
+    }).filter((place) => Number.isFinite(place.lat) && Number.isFinite(place.lng));
+    if (places.length) nearbyCarePlaces = places;
+    addNearbyCareMarkers();
+  } catch (error) {
+    console.warn('주변 의료시설 정보를 불러오지 못했습니다.', error);
+  }
+}
 
 function locationArrowIcon(heading = 0) {
   return L.divIcon({ className: 'location-arrow-wrap', html: `<span class="location-arrow" style="transform:rotate(${heading}deg)"></span>`, iconSize: [34, 34], iconAnchor: [17, 17] });
@@ -230,6 +264,7 @@ function distanceInMeters(lat1, lng1, lat2, lng2) {
 }
 
 function isCurrentlyOpen(place) {
+  if (!Array.isArray(place.openDays)) return null;
   const now = new Date();
   return place.openDays.includes(now.getDay()) && now.getHours() >= place.openStart && now.getHours() < place.openEnd;
 }
@@ -250,8 +285,10 @@ function addNearbyCareMarkers() {
     const renderPopup = () => {
       const distance = currentLocation ? distanceInMeters(currentLocation.latitude, currentLocation.longitude, place.lat, place.lng) : null;
       const open = isCurrentlyOpen(place);
+      const operationText = open === null ? '운영 시간 확인 필요' : open ? '현재 운영 중' : '현재 운영 종료';
+      const operationClass = open === null ? '' : open ? 'is-open' : 'is-closed';
       const mapUrl = `https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}`;
-      marker.bindPopup(`<div class="care-popup"><strong>${place.name}</strong><span class="care-type">${place.type}</span><b class="open-status ${open ? 'is-open' : 'is-closed'}">${open ? '현재 운영 중' : '현재 운영 종료'}</b><small>${place.hours}</small>${distance === null ? '' : `<small>내 위치에서 약 ${(distance / 1000).toFixed(1)}km</small>`}<a href="tel:${place.tel}">${place.tel}</a><a class="google-map-link" href="${mapUrl}" target="_blank" rel="noopener noreferrer">Google 지도에서 보기</a></div>`).openPopup();
+      marker.bindPopup(`<div class="care-popup"><strong>${place.name}</strong><span class="care-type">${place.type}</span><b class="open-status ${operationClass}">${operationText}</b><small>${place.hours}</small>${distance === null ? '' : `<small>내 위치에서 약 ${(distance / 1000).toFixed(1)}km</small>`}${place.tel === '전화번호 정보 확인 필요' ? `<small>${place.tel}</small>` : `<a href="tel:${place.tel}">${place.tel}</a>`}<a class="google-map-link" href="${mapUrl}" target="_blank" rel="noopener noreferrer">Google 지도에서 보기</a></div>`).openPopup();
     };
     marker.on('click', renderPopup);
   });
