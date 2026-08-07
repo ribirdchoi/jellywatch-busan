@@ -120,7 +120,7 @@ function updateLocationStatus(position) {
     addNearbyCareMarkers();
     loadNearbyCarePlaces();
   }
-  setMapPermissionGuide(`내 위치를 확인했습니다 · 반경 1km 의료시설을 표시합니다.`);
+  setMapPermissionGuide(`내 위치를 확인했습니다 · 반경 1km 피부과·응급실을 표시합니다.`);
   updateJellyfishRisk();
 }
 
@@ -221,10 +221,9 @@ document.querySelector('#mapLocate').addEventListener('click', requestAndCenterL
 document.querySelector('#requestLocationAgain')?.addEventListener('click', refreshPreciseLocation);
 
 let nearbyCarePlaces = [
-  { name: '광안리 보건소', type: '보건소', lat: 35.1539, lng: 129.1185, hours: '평일 09:00–18:00', openDays: [1, 2, 3, 4, 5], openStart: 9, openEnd: 18, tel: '051-000-0000' },
-  { name: '수영구 보건소', type: '보건소', lat: 35.1456, lng: 129.1130, hours: '평일 09:00–18:00', openDays: [1, 2, 3, 4, 5], openStart: 9, openEnd: 18, tel: '051-752-4000' },
-  { name: '좋은강안병원', type: '병원', lat: 35.1538, lng: 129.1122, hours: '24시간 응급실 운영', openDays: [0, 1, 2, 3, 4, 5, 6], openStart: 0, openEnd: 24, tel: '051-625-0900' },
-  { name: '부산성모병원', type: '병원', lat: 35.1328, lng: 129.1112, hours: '24시간 응급실 운영', openDays: [0, 1, 2, 3, 4, 5, 6], openStart: 0, openEnd: 24, tel: '051-933-7114' }
+  { name: '좋은강안병원 응급실', type: '응급실', lat: 35.1538, lng: 129.1122, hours: '24시간 운영', openDays: [0, 1, 2, 3, 4, 5, 6], openStart: 0, openEnd: 24, tel: '051-625-0900' },
+  { name: '부산성모병원 응급실', type: '응급실', lat: 35.1328, lng: 129.1112, hours: '24시간 운영', openDays: [0, 1, 2, 3, 4, 5, 6], openStart: 0, openEnd: 24, tel: '051-933-7114' },
+  { name: '광안리 피부과', type: '피부과', lat: 35.1534, lng: 129.1181, hours: '운영 시간은 전화로 확인하세요', openDays: null, tel: '전화번호 정보 확인 필요' }
 ];
 let lastCareQueryKey = '';
 
@@ -235,7 +234,8 @@ async function loadNearbyCarePlaces() {
   lastCareQueryKey = queryKey;
   const { latitude: lat, longitude: lng } = currentLocation;
   const span = 0.015;
-  const query = `[out:json][timeout:25];(nwr[amenity~"hospital|clinic"](${lat - span},${lng - span},${lat + span},${lng + span});nwr[healthcare~"hospital|clinic|centre|doctors"](${lat - span},${lng - span},${lat + span},${lng + span});nwr[amenity=public_health](${lat - span},${lng - span},${lat + span},${lng + span}););out center tags;`;
+  const area = `(${lat - span},${lng - span},${lat + span},${lng + span})`;
+  const query = `[out:json][timeout:25];(nwr[amenity=hospital][emergency~"yes|designated",i]${area};nwr[amenity=clinic][emergency=yes]${area};nwr[healthcare=doctor]["healthcare:speciality"~"dermatology|피부과",i]${area};nwr[healthcare=doctor][medical_speciality~"dermatology|피부과",i]${area};nwr[amenity=clinic][name~"피부과",i]${area};nwr[healthcare=clinic][name~"피부과",i]${area};);out center tags;`;
   try {
     const sources = ['https://overpass.kumi.systems/api/interpreter', 'https://overpass-api.de/api/interpreter'];
     let data = null;
@@ -248,15 +248,17 @@ async function loadNearbyCarePlaces() {
     if (!data) throw new Error('care_data_failed');
     const places = data.elements.map((item) => {
       const tags = item.tags || {};
-      const healthCenter = tags.healthcare === 'centre' || tags.amenity === 'public_health';
+      const emergency = tags.emergency === 'yes' || tags.emergency === 'designated' || /응급/.test(tags.name || '');
       return {
-        name: tags['name:ko'] || tags.name || (healthCenter ? '보건소' : '병원'),
-        type: healthCenter ? '보건소' : '병원',
+        name: tags['name:ko'] || tags.name || (emergency ? '응급실' : '피부과'),
+        type: emergency ? '응급실' : '피부과',
         lat: item.lat ?? item.center?.lat,
         lng: item.lon ?? item.center?.lon,
-        hours: tags.opening_hours || '운영 시간 정보 확인 필요',
+        hours: emergency ? (tags.opening_hours || '24시간 운영 여부는 전화로 확인하세요') : (tags.opening_hours || '운영 시간은 전화로 확인하세요'),
         tel: tags.phone || tags['contact:phone'] || '전화번호 정보 확인 필요',
-        openDays: null
+        openDays: emergency ? [0, 1, 2, 3, 4, 5, 6] : null,
+        openStart: emergency ? 0 : undefined,
+        openEnd: emergency ? 24 : undefined
       };
     }).filter((place) => Number.isFinite(place.lat) && Number.isFinite(place.lng));
     if (places.length) nearbyCarePlaces = places;
@@ -297,7 +299,7 @@ function addNearbyCareMarkers(force = false) {
   const nearbyCount = document.querySelector('#nearbyCount');
   if (nearbyCount) nearbyCount.textContent = nearbyPlaces.length;
   nearbyPlaces.forEach((place) => {
-    const iconClass = place.type === '병원' ? 'hospital-pin' : 'health-center-pin';
+    const iconClass = place.type === '응급실' ? 'hospital-pin' : 'health-center-pin';
     const icon = L.divIcon({ className: `care-marker ${iconClass}`, html: '<span aria-hidden="true"></span>', iconSize: [32, 32], iconAnchor: [16, 16] });
     const marker = L.marker([place.lat, place.lng], { icon }).addTo(nearbyCareLayer);
     const renderPopup = () => {
@@ -315,7 +317,7 @@ function addNearbyCareMarkers(force = false) {
 function initRealMap() {
   const mapElement = document.querySelector('.map-card');
   if (!mapElement || typeof L === 'undefined') return;
-  mapElement.insertAdjacentHTML('afterend', '<div class="care-map-legend" aria-label="지도 의료시설 마커 범례"><span><i class="care-legend-icon hospital-legend-icon" aria-hidden="true"></i><b>병원</b><small>빨간 십자가</small></span><span><i class="care-legend-icon health-legend-icon" aria-hidden="true"></i><b>보건소</b><small>초록 십자가</small></span></div>');
+  mapElement.insertAdjacentHTML('afterend', '<div class="care-map-legend" aria-label="지도 의료시설 마커 범례"><span><i class="care-legend-icon hospital-legend-icon" aria-hidden="true"></i><b>응급실</b><small>빨간 십자가</small></span><span><i class="care-legend-icon health-legend-icon" aria-hidden="true"></i><b>피부과</b><small>초록 십자가</small></span></div>');
   mapElement.innerHTML = '<div id="realMap" aria-label="부산 해안 지도"></div>';
   const koreaBounds = L.latLngBounds([32.8, 123.5], [39.8, 132.5]);
   currentMap = L.map('realMap', {
