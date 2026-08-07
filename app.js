@@ -228,18 +228,19 @@ const defaultNearbyCarePlaces = [
 ];
 let nearbyCarePlaces = [...defaultNearbyCarePlaces];
 let lastCareQueryKey = '';
+let careLoadInProgress = false;
 
 async function loadNearbyCarePlaces() {
   if (!currentLocation) return;
   const queryKey = `${currentLocation.latitude.toFixed(2)},${currentLocation.longitude.toFixed(2)}`;
-  if (queryKey === lastCareQueryKey) return;
-  lastCareQueryKey = queryKey;
+  if (queryKey === lastCareQueryKey || careLoadInProgress) return;
+  careLoadInProgress = true;
   const { latitude: lat, longitude: lng } = currentLocation;
   const span = 0.12;
   const area = `(${lat - span},${lng - span},${lat + span},${lng + span})`;
   const query = `[out:json][timeout:12];(nwr[amenity=hospital][emergency~"yes|designated",i]${area};nwr[amenity=clinic][emergency=yes]${area};nwr[healthcare=doctor]["healthcare:speciality"~"dermatology|피부과",i]${area};nwr[healthcare=doctor][medical_speciality~"dermatology|피부과",i]${area};nwr[name~"피부과",i]${area};nwr[name~"응급",i]${area};);out center tags;`;
   try {
-    const sources = ['https://overpass.kumi.systems/api/interpreter', 'https://overpass-api.de/api/interpreter'];
+    const sources = ['https://overpass.kumi.systems/api/interpreter', 'https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
     let data = null;
     for (const source of sources) {
       try {
@@ -276,9 +277,15 @@ async function loadNearbyCarePlaces() {
         return true;
       });
     }
+    lastCareQueryKey = queryKey;
     addNearbyCareMarkers(true);
   } catch (error) {
     console.warn('주변 의료시설 정보를 불러오지 못했습니다.', error);
+    setTimeout(() => {
+      if (currentLocation && lastCareQueryKey !== queryKey) loadNearbyCarePlaces();
+    }, 12000);
+  } finally {
+    careLoadInProgress = false;
   }
 }
 
@@ -336,7 +343,12 @@ const beachRiskZones = [
   { name: '해운대 해수욕장', lat: 35.1587, lng: 129.1604, shape: [[35.1549,129.1532],[35.1554,129.1700],[35.1618,129.1694],[35.1622,129.1540]] },
   { name: '송정 해수욕장', lat: 35.1802, lng: 129.1996, shape: [[35.1772,129.1939],[35.1778,129.2054],[35.1828,129.2055],[35.1835,129.1953]] },
   { name: '일광 해수욕장', lat: 35.2615, lng: 129.2322, shape: [[35.2580,129.2260],[35.2587,129.2382],[35.2652,129.2381],[35.2657,129.2268]] },
-  { name: '임랑 해수욕장', lat: 35.3157, lng: 129.2632, shape: [[35.3126,129.2579],[35.3131,129.2690],[35.3187,129.2694],[35.3191,129.2585]] }
+  { name: '임랑 해수욕장', lat: 35.3157, lng: 129.2632, shape: [[35.3126,129.2579],[35.3131,129.2690],[35.3187,129.2694],[35.3191,129.2585]] },
+  { name: '을숙도·낙동강 하구', lat: 35.1041, lng: 128.9586, shape: [[35.0967,128.9440],[35.0980,128.9700],[35.1088,128.9706],[35.1107,128.9464]] },
+  { name: '몰운대 해안', lat: 35.0489, lng: 128.9597, shape: [[35.0431,128.9488],[35.0441,128.9632],[35.0523,128.9645],[35.0534,128.9505]] },
+  { name: '오륙도·이기대 해안', lat: 35.0996, lng: 129.1240, shape: [[35.0928,129.1115],[35.0942,129.1360],[35.1058,129.1362],[35.1069,129.1140]] },
+  { name: '대변항 해안', lat: 35.2443, lng: 129.2506, shape: [[35.2391,129.2441],[35.2401,129.2589],[35.2483,129.2588],[35.2491,129.2458]] },
+  { name: '칠암 해안', lat: 35.3007, lng: 129.2790, shape: [[35.2960,129.2731],[35.2969,129.2853],[35.3056,129.2857],[35.3062,129.2744]] }
 ];
 
 function updateBeachRiskZones(reports = []) {
