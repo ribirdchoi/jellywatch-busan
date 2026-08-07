@@ -15,7 +15,6 @@ const accuracy = document.querySelector('#accuracy');
 let currentLocation = null;
 let currentMap = null;
 let currentUserMarker = null;
-let currentLocationArrow = null;
 let nearbyCareLayer = null;
 let locationWatchId = null;
 let jellyfishModelPromise = null;
@@ -61,15 +60,8 @@ function updateLocationStatus(position) {
   locationStatus.textContent = `⌖ 위치 확인 완료 · 오차 약 ${currentLocation.accuracy}m`;
   if (currentMap && typeof L !== 'undefined') {
     const point = [currentLocation.latitude, currentLocation.longitude];
-    const heading = Number.isFinite(position.coords.heading) ? position.coords.heading : 0;
-    if (currentLocationArrow) {
-      currentLocationArrow.setLatLng(point);
-      currentLocationArrow.setIcon(locationArrowIcon(heading));
-    } else {
-      currentLocationArrow = L.marker(point, { icon: locationArrowIcon(heading), zIndexOffset: 1000 }).addTo(currentMap);
-    }
     if (currentUserMarker) currentUserMarker.setLatLng(point);
-    else currentUserMarker = L.circleMarker(point, { radius: 8, color: '#16313d', fillColor: '#95e7e0', fillOpacity: 1 }).addTo(currentMap);
+    else currentUserMarker = L.circleMarker(point, { radius: 9, stroke: false, fillColor: '#e7473f', fillOpacity: 1 }).addTo(currentMap);
     currentMap.setView(point, Math.max(currentMap.getZoom(), 14), { animate: false });
     addNearbyCareMarkers();
   }
